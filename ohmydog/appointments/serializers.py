@@ -4,12 +4,14 @@ from ohmydog.appointments import exceptions
 
 class AppointmentSerializer(serializers.ModelSerializer):
     pet_name = serializers.SerializerMethodField()
+    user_fullname = serializers.SerializerMethodField()
 
     class Meta:
         model = Appointment
         fields = [
             'id',
             'user',
+            'user_fullname',
             'pet_id',
             'pet_name',
             'reason',
@@ -24,6 +26,9 @@ class AppointmentSerializer(serializers.ModelSerializer):
     
     def get_pet_name(self, instance):
         return instance.pet.name
+    
+    def get_user_fullname(self, instance):
+        return f'{instance.user.first_name} {instance.user.last_name}'
 
 class AppointmentRequestSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
