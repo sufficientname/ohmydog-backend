@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 
 import datetime
+from django.utils import timezone
 
 from ohmydog.appointments import constants
 from ohmydog.appointments import exceptions
@@ -9,7 +10,7 @@ from ohmydog.appointments import exceptions
 
 class AppointmentManager(models.Manager):
 
-    def create_appointment_request(self, user, pet, reason, request_date, request_timeslot):        
+    def create_appointment_request(self, user, pet, reason, date, timeslot):        
         days_to_booster = 0
         if reason == constants.REASON_VACCINATION_A:
             days_to_booster = check_vaccine_a(pet)
@@ -21,8 +22,8 @@ class AppointmentManager(models.Manager):
             user=user,
             pet=pet,
             reason=reason,
-            request_date=request_date,
-            request_timeslot=request_timeslot,
+            date=date,
+            timeslot=timeslot,
             days_to_booster = days_to_booster
         )
         appointment.save()
@@ -35,28 +36,46 @@ class Appointment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.Model, null=False)
     pet = models.ForeignKey('pets.Pet', on_delete=models.CASCADE, null=False)
     reason = models.CharField(max_length=16, choices=constants.REASON_CHOICES, null=False)
-    request_date = models.DateField(null=False)
-    request_timeslot = models.CharField(max_length=16, choices=constants.TIMESLOT_CHOICES, null=False)
-    actual_datetime = models.DateTimeField(null=True)
-    suggestion_datetime = models.DateTimeField(null=True)
+    date = models.DateField(null=False)
+    timeslot = models.CharField(max_length=16, choices=constants.TIMESLOT_CHOICES, null=False)
+    hour = models.TimeField(null=True)
+    suggestion_date = models.DateField(null=True)
     status = models.CharField(max_length=16, choices=constants.STATUS_CHOICES, default=constants.STATUS_PENDING, null=False)
     observations = models.TextField(null=False)
     days_to_booster = models.IntegerField(null=False)
 
-    def approve(self, actual_datetime: datetime.datetime):
-        if self.status != constants.STATUS_PENDING:
-            return
-        self.status = constants.STATUS_APPROVED
-        self.actual_datetime = actual_datetime
+    def can_accept(self):
+        return (
+            self.status == constants.STATUS_PENDING and
+            self.date > datetime.date.today()
+        )
 
-    def reject(self, suggestion_datetime: datetime.datetime):
-        if self.status != constants.STATUS_PENDING:
+    def accept(self, hour):
+        if not self.can_accept():
+            return
+        self.status = constants.STATUS_ACCEPTED
+        self.hour = hour
+
+    def can_reject(self):
+        return (
+            (self.status == constants.STATUS_PENDING) and
+            (self.date > datetime.date.today())
+        )
+
+    def reject(self, suggestion_date):
+        if not self.can_reject():
             return
         self.status = constants.STATUS_REJECTED
-        self.suggestion_datetime = suggestion_datetime
+        self.suggestion_date = suggestion_date
+
+    def can_cancel(self):
+        return (
+            (self.status in [constants.STATUS_PENDING, constants.STATUS_ACCEPTED]) and
+            (self.date > datetime.date.today())
+        )
 
     def cancel(self):
-        if self.status not in [constants.STATUS_PENDING, constants.STATUS_APPROVED]:
+        if not self.can_cancel():
             return
         self.status = constants.STATUS_CANCELED
 

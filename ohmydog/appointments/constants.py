@@ -21,15 +21,15 @@ REASON_CHOICES = [
 ]
 
 STATUS_PENDING = 'PEN'
-STATUS_APPROVED = 'APR'
+STATUS_ACCEPTED = 'APR'
 STATUS_REJECTED = 'REJ'
 STATUS_CANCELED = 'CAN'
 STATUS_COMPLETED = 'COM'
 
 STATUS_CHOICES = [
-    (STATUS_PENDING, 'Pending'),
-    (STATUS_APPROVED, 'Approved'),
-    (STATUS_REJECTED, 'Rejected'),
-    (STATUS_CANCELED, 'Canceled'),
-    (STATUS_COMPLETED, 'Completed'),
+    (STATUS_PENDING, 'Pendiente'),
+    (STATUS_ACCEPTED, 'Aceptado'),
+    (STATUS_REJECTED, 'Rechazado'),
+    (STATUS_CANCELED, 'Cancelado'),
+    (STATUS_COMPLETED, 'Completado'),
 ]

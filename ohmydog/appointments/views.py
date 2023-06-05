@@ -7,7 +7,7 @@ from ohmydog.appointments.models import Appointment
 from ohmydog.appointments.serializers import (
     AppointmentSerializer,
     AppointmentRequestSerializer,
-    AppointmentApproveSerializer,
+    AppointmentAcceptSerializer,
     AppointmentRejectSerializer,
     AppointmentCancelSerializer
 )
@@ -48,14 +48,14 @@ class AppointmentAdminViewSet(mixins.RetrieveModelMixin,
         return Appointment.objects.all()
     
     def get_serializer_class(self):
-        if self.action == 'approve':
-            return AppointmentApproveSerializer
+        if self.action == 'accept':
+            return AppointmentAcceptSerializer
         if self.action == 'reject':
             return AppointmentRejectSerializer
         return AppointmentSerializer
 
-    @action(methods=['POST'], detail=True, url_path='approve')
-    def approve(self, request, pk=None):
+    @action(methods=['POST'], detail=True, url_path='accept')
+    def accept(self, request, pk=None):
         appointment = self.get_object()
         serializer = self.get_serializer(appointment, data=request.data)
         serializer.is_valid(raise_exception=True)

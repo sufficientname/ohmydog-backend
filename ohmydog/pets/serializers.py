@@ -17,14 +17,19 @@ class PetSerializer(serializers.ModelSerializer):
         ]
 
 class PetAdminSerializer(serializers.ModelSerializer):
-    
+    user_fullname = serializers.SerializerMethodField()
+
     class Meta:
         model = Pet
         fields = [
             'id',
             'user',
+            'user_fullname',
             'name',
             'breed',
             'color',
             'birthdate',
         ]
+
+    def get_user_fullname(self, instance):
+        return f'{instance.user.first_name} {instance.user.last_name}'

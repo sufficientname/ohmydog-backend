@@ -15,13 +15,16 @@ class AppointmentSerializer(serializers.ModelSerializer):
             'pet_id',
             'pet_name',
             'reason',
-            'request_date',
-            'request_timeslot',
-            'actual_datetime',
-            'suggestion_datetime',
+            'date',
+            'timeslot',
+            'hour',
+            'suggestion_date',
             'status',
             'observations',
             'days_to_booster',
+            'can_accept',
+            'can_reject',
+            'can_cancel',
         ]
     
     def get_pet_name(self, instance):
@@ -39,8 +42,8 @@ class AppointmentRequestSerializer(serializers.ModelSerializer):
             'pet',
             'user',
             'reason',
-            'request_date',
-            'request_timeslot',
+            'date',
+            'timeslot',
         ]
 
     def to_representation(self, instance):
@@ -66,32 +69,42 @@ class AppointmentActionSerializer(serializers.ModelSerializer):
         raise NotImplementedError('`create()` must be implemented.')
 
 
-class AppointmentApproveSerializer(AppointmentActionSerializer):
-    actual_datetime = serializers.DateTimeField(required=True)
+class AppointmentAcceptSerializer(AppointmentActionSerializer):
+    hour = serializers.TimeField(required=True)
     
     class Meta:
         model = Appointment
         fields = [
-            'actual_datetime',
+            'hour',
         ]
 
+    def validate(self, attrs):
+        if not self.instance.can_accept():
+            raise serializers.ValidationError("Este turno no puede ser aprobado")
+        return attrs
+
     def update(self, instance: Appointment, validated_data):
-        instance.approve(self.validated_data['actual_datetime'])
+        instance.accept(self.validated_data['hour'])
         instance.save()
         return instance
 
 
 class AppointmentRejectSerializer(AppointmentActionSerializer):
-    suggestion_datetime = serializers.DateTimeField(required=True)
+    suggestion_date = serializers.DateField(required=True)
 
     class Meta:
         model = Appointment
         fields = [
-            'suggestion_datetime'
+            'suggestion_date'
         ]
 
+    def validate(self, attrs):
+        if not self.instance.can_reject():
+            raise serializers.ValidationError("Este turno no puede ser rechazado")
+        return attrs
+
     def update(self, instance: Appointment, validated_data):
-        instance.reject(self.validated_data['suggestion_datetime'])
+        instance.reject(self.validated_data['suggestion_date'])
         self.instance.save()
         return instance
 
@@ -100,6 +113,11 @@ class AppointmentCancelSerializer(AppointmentActionSerializer):
     class Meta:
         model = Appointment
         fields = []
+
+    def validate(self, attrs):
+        if not self.instance.can_cancel():
+            raise serializers.ValidationError("Este turno no puede ser cancelado")
+        return attrs
 
     def update(self, instance: Appointment, validated_data):
         instance.cancel()
