@@ -22,6 +22,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
             'status',
             'observations',
             'days_to_booster',
+            'booster_date',
             'can_accept',
             'can_reject',
             'can_cancel',
@@ -58,7 +59,7 @@ class AppointmentRequestSerializer(serializers.ModelSerializer):
         try:
             return self.Meta.model.objects.create_appointment_request(**validated_data)
         except exceptions.BadReasonError as e:
-            raise serializers.ValidationError(str(e))
+            raise serializers.ValidationError({'non_field_errors': [str(e)]})
 
 class AppointmentActionSerializer(serializers.ModelSerializer):
 

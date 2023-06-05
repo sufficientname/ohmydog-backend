@@ -5,7 +5,7 @@ from rest_framework.authtoken.views import ObtainAuthToken
 
 
 admin_router = routers.DefaultRouter()
-admin_router.register('users', views.AdminUserViewSet, basename='basename')
+admin_router.register('users', views.AdminUserViewSet, basename='user')
 
 app_name = 'users_app'
 

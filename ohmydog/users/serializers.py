@@ -17,6 +17,8 @@ class UserSerializer(serializers.ModelSerializer):
             'last_name',
             'is_staff',
             'id_number',
+            'phone_number',
+            'birthdate',
         ]
         read_only_fields = [
             'is_staff',
@@ -31,7 +33,9 @@ class UserSerializer(serializers.ModelSerializer):
             password=password,
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
-            id_number=validated_data['id_number']
+            id_number=validated_data['id_number'],
+            phone_number=validated_data['phone_number'],
+            birthdate=validated_data['birthdate'],
         )
 
         send_mail(

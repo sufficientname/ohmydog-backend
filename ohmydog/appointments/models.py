@@ -2,7 +2,6 @@ from django.db import models
 from django.conf import settings
 
 import datetime
-from django.utils import timezone
 
 from ohmydog.appointments import constants
 from ohmydog.appointments import exceptions
@@ -33,7 +32,7 @@ class AppointmentManager(models.Manager):
 class Appointment(models.Model):
     objects = AppointmentManager()
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.Model, null=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False)
     pet = models.ForeignKey('pets.Pet', on_delete=models.CASCADE, null=False)
     reason = models.CharField(max_length=16, choices=constants.REASON_CHOICES, null=False)
     date = models.DateField(null=False)
@@ -44,6 +43,11 @@ class Appointment(models.Model):
     observations = models.TextField(null=False)
     days_to_booster = models.IntegerField(null=False)
 
+    def booster_date(self):
+        if not self.days_to_booster:
+            return None
+        return self.date + datetime.timedelta(days=self.days_to_booster)
+    
     def can_accept(self):
         return (
             self.status == constants.STATUS_PENDING and

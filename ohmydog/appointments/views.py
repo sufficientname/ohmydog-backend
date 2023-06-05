@@ -1,8 +1,10 @@
+import datetime
+
 from rest_framework import viewsets, mixins
-from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
+from ohmydog import permissions
 from ohmydog.appointments.models import Appointment
 from ohmydog.appointments.serializers import (
     AppointmentSerializer,
@@ -17,11 +19,11 @@ class AppointmentViewSet(mixins.CreateModelMixin,
                               mixins.RetrieveModelMixin,
                               mixins.ListModelMixin,
                               viewsets.GenericViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsCustomerUser]
 
     def get_queryset(self):
         user = self.request.user
-        return Appointment.objects.filter(user=user)
+        return Appointment.objects.filter(user=user).order_by('date')
     
     def get_serializer_class(self):
         if self.action == 'create':
@@ -45,9 +47,12 @@ class AppointmentAdminViewSet(mixins.RetrieveModelMixin,
     permission_classes = [permissions.IsAdminUser]
 
     def get_queryset(self):
-        return Appointment.objects.all()
+        today = datetime.date.today()
+        return Appointment.objects.all().order_by('date')
     
     def get_serializer_class(self):
+        if self.action == 'create':
+            return AppointmentRequestSerializer
         if self.action == 'accept':
             return AppointmentAcceptSerializer
         if self.action == 'reject':

@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 from ohmydog.users.models import User
 from ohmydog.pets.models import Pet
 
-import datetime
+import datetime 
 
 class Command(BaseCommand):
     help = "Fills the db with some data"
@@ -18,7 +18,9 @@ class Command(BaseCommand):
             'user1',
             first_name='user',
             last_name='one',
-            id_number='1111'
+            id_number='1111',
+            phone_number='(221) 111-1111',
+            birthdate=datetime.date(2001, 1, 1)
         )
 
         self.stdout.write(self.style.SUCCESS('created user: %s' % user1))
@@ -29,7 +31,9 @@ class Command(BaseCommand):
             'user2',
             first_name='user',
             last_name='two',
-            id_number='2222'
+            id_number='2222',
+            phone_number='(221) 222-2222',
+            birthdate=datetime.date(2002, 2, 2)
         )
         self.stdout.write(self.style.SUCCESS('created user: %s' % user2))
 

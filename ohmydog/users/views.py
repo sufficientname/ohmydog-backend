@@ -1,10 +1,9 @@
 from rest_framework import generics
 from rest_framework import viewsets
-from rest_framework import permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-
+from ohmydog import permissions
 from ohmydog.users.models import User
 from ohmydog.users.serializers import UserSerializer, UserPasswordSerializer
 

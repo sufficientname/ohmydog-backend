@@ -1,13 +1,13 @@
 from rest_framework import viewsets
-from rest_framework import permissions
 from rest_framework.decorators import action
 
+from ohmydog import permissions
 from ohmydog.pets.models import Pet
 from ohmydog.pets.serializers import PetSerializer, PetAdminSerializer
 
 class PetViewSet(viewsets.ModelViewSet):
     serializer_class = PetSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsCustomerUser]
 
     def get_queryset(self):
         user = self.request.user
