@@ -19,6 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
             'id_number',
             'phone_number',
             'birthdate',
+            'password_set',
         ]
         read_only_fields = [
             'is_staff',
@@ -64,6 +65,7 @@ class UserPasswordSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.set_password(validated_data['password'])
+        instance.password_set = True
         instance.save()
         request = self.context.get('request', None)
         if request is not None:

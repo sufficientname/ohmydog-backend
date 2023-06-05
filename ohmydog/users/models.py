@@ -11,3 +11,4 @@ class User(AbstractUser):
     id_number = models.CharField(_("id number"), max_length=32, unique=True, null=False)
     phone_number = models.CharField(_("phone number"), max_length=32, null=True)
     birthdate = models.DateField(_("birth date"), null=True)
+    password_set = models.BooleanField(_("password set"), default=False, null=False)
