@@ -1,7 +1,16 @@
-TIMESLOT_CHOICES = [
-    ('MANANA', 'Mañana'),
-    ('TARDE', 'Tarde'),
-]
+from ohmydog.utils.choices import choice, make_choices
+
+
+TIMESLOT_MORNING = 'MANANA'
+TIMESLOT_AFTERNOON = 'TARDE'
+
+TIMESLOTS = {
+    TIMESLOT_MORNING: choice(TIMESLOT_MORNING, 'Mañana'),
+    TIMESLOT_AFTERNOON: choice(TIMESLOT_AFTERNOON, 'Tarde'),
+}
+
+TIMESLOT_CHOICES = make_choices(TIMESLOTS)
+
 
 REASON_CONSULTATION = "CONSULTA_GENERAL"
 REASON_VACCINATION_A = "VACUNACION_A"
@@ -10,15 +19,17 @@ REASON_DEWORMING = "DESPARASITACION"
 REASON_CASTRATION = "CASTRACION"
 REASON_URGENCY = "URGENCIA"
 
+REASONS = {
+    REASON_CONSULTATION: choice(REASON_CONSULTATION, 'Consulta general'),
+    REASON_VACCINATION_A: choice(REASON_VACCINATION_A, 'Vacunacion A'),
+    REASON_VACCINATION_B: choice(REASON_VACCINATION_B, 'Vacunacion B'),
+    REASON_DEWORMING: choice(REASON_DEWORMING, 'Desparasitacion'),
+    REASON_CASTRATION: choice(REASON_CASTRATION, 'Castracion'),
+    REASON_URGENCY: choice(REASON_URGENCY, 'Urgencia'),
+}
 
-REASON_CHOICES = [
-    (REASON_CONSULTATION, 'Consulta general'),
-    (REASON_VACCINATION_A, 'Vacunacion A'),
-    (REASON_VACCINATION_B, 'Vacunacion B'),
-    (REASON_DEWORMING, 'Desparasitacion'),
-    (REASON_CASTRATION, 'Castracion'),
-    (REASON_URGENCY, 'Urgencia'),
-]
+REASON_CHOICES = make_choices(REASONS)
+
 
 STATUS_PENDING = 'PEN'
 STATUS_ACCEPTED = 'APR'
@@ -26,10 +37,12 @@ STATUS_REJECTED = 'REJ'
 STATUS_CANCELED = 'CAN'
 STATUS_COMPLETED = 'COM'
 
-STATUS_CHOICES = [
-    (STATUS_PENDING, 'Pendiente'),
-    (STATUS_ACCEPTED, 'Aceptado'),
-    (STATUS_REJECTED, 'Rechazado'),
-    (STATUS_CANCELED, 'Cancelado'),
-    (STATUS_COMPLETED, 'Completado'),
-]
+STATUSES = {
+    STATUS_PENDING: choice(STATUS_PENDING, 'Pendiente'), 
+    STATUS_ACCEPTED: choice(STATUS_ACCEPTED, 'Aceptado'),
+    STATUS_REJECTED: choice(STATUS_REJECTED, 'Rechazado'),
+    STATUS_CANCELED: choice(STATUS_CANCELED, 'Cancelado'),
+    STATUS_COMPLETED: choice(STATUS_COMPLETED, 'Completado'),
+}
+
+STATUS_CHOICES = make_choices(STATUSES)

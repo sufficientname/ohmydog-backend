@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from django.contrib.auth import authenticate, update_session_auth_hash
 
+from django.conf import settings
+from django.contrib.auth import update_session_auth_hash
 from django.core.mail import send_mail
 
 from ohmydog.users.models import User
@@ -42,7 +43,7 @@ class UserSerializer(serializers.ModelSerializer):
         send_mail(
             'Bienvenido a Oh my dog!',
             f'Su contraseña es {password}',
-            "contacto@ohmydog.com.ar",
+            settings.EMAIL_DEFAULT_FROM,
             [user.email],
             fail_silently=True,
         )

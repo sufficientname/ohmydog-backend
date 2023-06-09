@@ -45,6 +45,7 @@ class AppointmentAdminViewSet(mixins.RetrieveModelMixin,
                               mixins.ListModelMixin,
                               viewsets.GenericViewSet):
     permission_classes = [permissions.IsAdminUser]
+    filterset_fields = ['pet', 'status']
 
     def get_queryset(self):
         today = datetime.date.today()

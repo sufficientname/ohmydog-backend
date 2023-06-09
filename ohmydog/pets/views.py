@@ -20,6 +20,7 @@ class PetViewSet(viewsets.ModelViewSet):
 class PetAdminViewSet(viewsets.ModelViewSet):
     serializer_class = PetAdminSerializer
     permission_classes = [permissions.IsAdminUser]
+    filterset_fields = ['user']
 
     def get_queryset(self):
         return Pet.objects.all()

@@ -30,4 +30,4 @@ class AdminUserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(is_staff=False).order_by('-date_joined')
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAdminUser]
-
+    filterset_fields = ['id_number']

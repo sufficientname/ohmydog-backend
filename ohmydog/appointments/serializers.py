@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from ohmydog.appointments.models import Appointment
 from ohmydog.appointments import exceptions
+from ohmydog.appointments import constants
 
 class AppointmentSerializer(serializers.ModelSerializer):
     pet_name = serializers.SerializerMethodField()
@@ -33,6 +34,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
     
     def get_user_fullname(self, instance):
         return f'{instance.user.first_name} {instance.user.last_name}'
+    
 
 class AppointmentRequestSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
@@ -61,16 +63,8 @@ class AppointmentRequestSerializer(serializers.ModelSerializer):
         except exceptions.BadReasonError as e:
             raise serializers.ValidationError({'non_field_errors': [str(e)]})
 
-class AppointmentActionSerializer(serializers.ModelSerializer):
 
-    def to_representation(self, instance):
-        return AppointmentSerializer(instance).to_representation(instance)
-
-    def create(self, validated_data):
-        raise NotImplementedError('`create()` must be implemented.')
-
-
-class AppointmentAcceptSerializer(AppointmentActionSerializer):
+class AppointmentAcceptSerializer(serializers.ModelSerializer):
     hour = serializers.TimeField(required=True)
     
     class Meta:
@@ -78,6 +72,9 @@ class AppointmentAcceptSerializer(AppointmentActionSerializer):
         fields = [
             'hour',
         ]
+
+    def to_representation(self, instance):
+        return AppointmentSerializer(instance).to_representation(instance)
 
     def validate(self, attrs):
         if not self.instance.can_accept():
@@ -90,14 +87,17 @@ class AppointmentAcceptSerializer(AppointmentActionSerializer):
         return instance
 
 
-class AppointmentRejectSerializer(AppointmentActionSerializer):
+class AppointmentRejectSerializer(serializers.ModelSerializer):
     suggestion_date = serializers.DateField(required=True)
 
     class Meta:
         model = Appointment
         fields = [
-            'suggestion_date'
+            'suggestion_date',
         ]
+    
+    def to_representation(self, instance):
+        return AppointmentSerializer(instance).to_representation(instance)
 
     def validate(self, attrs):
         if not self.instance.can_reject():
@@ -109,11 +109,14 @@ class AppointmentRejectSerializer(AppointmentActionSerializer):
         self.instance.save()
         return instance
 
-class AppointmentCancelSerializer(AppointmentActionSerializer):
+class AppointmentCancelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
         fields = []
+
+    def to_representation(self, instance):
+        return AppointmentSerializer(instance).to_representation(instance)
 
     def validate(self, attrs):
         if not self.instance.can_cancel():
