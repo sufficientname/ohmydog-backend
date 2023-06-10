@@ -41,7 +41,8 @@ class Appointment(models.Model):
     suggestion_date = models.DateField(null=True)
     status = models.CharField(max_length=16, choices=constants.STATUS_CHOICES, default=constants.STATUS_PENDING, null=False)
     observations = models.TextField(null=False)
-    days_to_booster = models.IntegerField(null=False)
+    days_to_booster = models.PositiveIntegerField(null=False)
+    price = models.PositiveIntegerField(null=False, default=0)
 
     def booster_date(self):
         if not self.days_to_booster:
@@ -82,6 +83,19 @@ class Appointment(models.Model):
         if not self.can_cancel():
             return
         self.status = constants.STATUS_CANCELED
+
+    def can_complete(self):
+        return(
+            (self.status == constants.STATUS_ACCEPTED) and
+            (self.date <= datetime.date.today())
+        )
+
+    def complete(self, price, observations):
+        if not self.can_complete():
+            return
+        self.status = constants.STATUS_COMPLETED
+        self.price = price
+        self.observations = observations
 
 
     

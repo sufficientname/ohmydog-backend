@@ -24,8 +24,11 @@ class AppointmentSerializer(serializers.ModelSerializer):
             'observations',
             'days_to_booster',
             'booster_date',
+            'observations',
+            'price',
             'can_accept',
             'can_reject',
+            'can_complete',
             'can_cancel',
         ]
     
@@ -82,7 +85,7 @@ class AppointmentAcceptSerializer(serializers.ModelSerializer):
         return attrs
 
     def update(self, instance: Appointment, validated_data):
-        instance.accept(self.validated_data['hour'])
+        instance.accept(validated_data['hour'])
         instance.save()
         return instance
 
@@ -105,7 +108,29 @@ class AppointmentRejectSerializer(serializers.ModelSerializer):
         return attrs
 
     def update(self, instance: Appointment, validated_data):
-        instance.reject(self.validated_data['suggestion_date'])
+        instance.reject(validated_data['suggestion_date'])
+        self.instance.save()
+        return instance
+
+class AppointmentCompleteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Appointment
+        fields = [
+            'price',
+            'observations'
+        ]
+
+    def to_representation(self, instance):
+        return AppointmentSerializer(instance).to_representation(instance)
+
+    def validate(self, attrs):
+        if not self.instance.can_complete():
+            raise serializers.ValidationError("Este turno no puede ser completado")
+        return attrs
+
+    def update(self, instance: Appointment, validated_data):
+        instance.complete(validated_data['price'], validated_data['observations'])
         self.instance.save()
         return instance
 

@@ -11,7 +11,8 @@ from ohmydog.appointments.serializers import (
     AppointmentRequestSerializer,
     AppointmentAcceptSerializer,
     AppointmentRejectSerializer,
-    AppointmentCancelSerializer
+    AppointmentCancelSerializer,
+    AppointmentCompleteSerializer
 )
 
 
@@ -58,6 +59,8 @@ class AppointmentAdminViewSet(mixins.RetrieveModelMixin,
             return AppointmentAcceptSerializer
         if self.action == 'reject':
             return AppointmentRejectSerializer
+        if self.action == 'complete':
+            return AppointmentCompleteSerializer
         return AppointmentSerializer
 
     @action(methods=['POST'], detail=True, url_path='accept')
@@ -70,6 +73,14 @@ class AppointmentAdminViewSet(mixins.RetrieveModelMixin,
 
     @action(methods=['POST'], detail=True, url_path='reject')
     def reject(self, request, pk=None):
+        appointment = self.get_object()
+        serializer = self.get_serializer(appointment, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    @action(methods=['POST'], detail=True, url_path="complete")
+    def complete(self, request, pk=None):
         appointment = self.get_object()
         serializer = self.get_serializer(appointment, data=request.data)
         serializer.is_valid(raise_exception=True)
