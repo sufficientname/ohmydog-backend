@@ -11,6 +11,9 @@ class Pet(models.Model):
     color = models.CharField(max_length=32, null=False, blank=False)
     birthdate = models.DateField(null=False)
 
+    class Meta:
+        unique_together = [["name", "user"]]
+
     def __str__(self):
         return f'{self.name} ({self.age_months()})'
 

@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 
 import datetime
+import decimal
 
 from ohmydog.appointments import constants
 from ohmydog.appointments import exceptions
@@ -42,7 +43,7 @@ class Appointment(models.Model):
     status = models.CharField(max_length=16, choices=constants.STATUS_CHOICES, default=constants.STATUS_PENDING, null=False)
     observations = models.TextField(null=False)
     days_to_booster = models.PositiveIntegerField(null=False)
-    price = models.PositiveIntegerField(null=False, default=0)
+    price = models.DecimalField(max_digits=16 ,decimal_places=2, null=False, default=0)
 
     def booster_date(self):
         if not self.days_to_booster:

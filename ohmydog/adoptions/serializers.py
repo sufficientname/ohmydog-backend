@@ -8,6 +8,8 @@ from ohmydog.adoptions.models import AdoptionAd
 
 class AdoptionAdSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    pet_age = serializers.IntegerField(min_value=0)
+    is_mine = serializers.SerializerMethodField()
 
     class Meta:
         model = AdoptionAd
@@ -15,12 +17,15 @@ class AdoptionAdSerializer(serializers.ModelSerializer):
             'id',
             'user',
             'user_id',
+            'is_mine',
             'pet_name',
             'pet_age',
             'pet_gender',
             'pet_size',
             'status',
             'date_created',
+            'can_complete',
+            'can_cancel',
         ]
         read_only_fields = [
             'id',
@@ -29,6 +34,9 @@ class AdoptionAdSerializer(serializers.ModelSerializer):
             'date_created',
         ]
     
+    def get_is_mine(self, instance: AdoptionAd):
+        return instance.user == self.context['request'].user
+
     def create(self, validated_data):
         ad = super().create(validated_data)
 
@@ -41,3 +49,41 @@ class AdoptionAdSerializer(serializers.ModelSerializer):
         )
 
         return ad
+
+
+class AdoptionAdCompleteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdoptionAd
+        fields = []
+
+    def to_representation(self, instance):
+        return AdoptionAdSerializer(instance, context=self.context).to_representation(instance)
+
+    def validate(self, attrs):
+        if not self.instance.can_complete():
+            raise serializers.ValidationError("Este anuncio no puede ser completado")
+        return attrs
+
+    def update(self, instance: AdoptionAd, validated_data):
+        instance.complete()
+        self.instance.save()
+        return instance
+
+
+class AdoptionAdCancelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdoptionAd
+        fields = []
+
+    def to_representation(self, instance):
+        return AdoptionAdSerializer(instance, context=self.context).to_representation(instance)
+
+    def validate(self, attrs):
+        if not self.instance.can_cancel():
+            raise serializers.ValidationError("Este anuncio no puede ser cancelado")
+        return attrs
+
+    def update(self, instance: AdoptionAd, validated_data):
+        instance.cancel()
+        self.instance.save()
+        return instance

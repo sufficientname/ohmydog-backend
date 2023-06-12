@@ -21,10 +21,11 @@ class AppointmentViewSet(mixins.CreateModelMixin,
                               mixins.ListModelMixin,
                               viewsets.GenericViewSet):
     permission_classes = [permissions.IsCustomerUser]
+    filterset_fields = ['pet', 'status']
 
     def get_queryset(self):
         user = self.request.user
-        return Appointment.objects.filter(user=user).order_by('date')
+        return Appointment.objects.filter(user=user).order_by('date', 'hour')
     
     def get_serializer_class(self):
         if self.action == 'create':
@@ -50,7 +51,7 @@ class AppointmentAdminViewSet(mixins.RetrieveModelMixin,
 
     def get_queryset(self):
         today = datetime.date.today()
-        return Appointment.objects.all().order_by('date')
+        return Appointment.objects.all().order_by('date', 'hour')
     
     def get_serializer_class(self):
         if self.action == 'create':

@@ -22,7 +22,7 @@ class IsCustomerUserOrReadOnly(permissions.BasePermission):
             request.user.is_authenticated and
             not request.user.is_staff
         )
-    
+
 IsAuthenticated = permissions.IsAuthenticated
 
 IsAdminUser = permissions.IsAdminUser

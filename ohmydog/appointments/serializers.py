@@ -53,7 +53,7 @@ class AppointmentRequestSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-        return AppointmentSerializer(instance).to_representation(instance)
+        return AppointmentSerializer(instance, context=self.context).to_representation(instance)
 
     def validate_pet(self, value):
         if value.user_id != self.context['request'].user.id:
@@ -77,7 +77,7 @@ class AppointmentAcceptSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-        return AppointmentSerializer(instance).to_representation(instance)
+        return AppointmentSerializer(instance, context=self.context).to_representation(instance)
 
     def validate(self, attrs):
         if not self.instance.can_accept():
@@ -100,7 +100,7 @@ class AppointmentRejectSerializer(serializers.ModelSerializer):
         ]
     
     def to_representation(self, instance):
-        return AppointmentSerializer(instance).to_representation(instance)
+        return AppointmentSerializer(instance, context=self.context).to_representation(instance)
 
     def validate(self, attrs):
         if not self.instance.can_reject():
@@ -112,7 +112,9 @@ class AppointmentRejectSerializer(serializers.ModelSerializer):
         self.instance.save()
         return instance
 
+
 class AppointmentCompleteSerializer(serializers.ModelSerializer):
+    price = serializers.DecimalField(max_digits=16 ,decimal_places=2, min_value=0)
 
     class Meta:
         model = Appointment
@@ -122,7 +124,7 @@ class AppointmentCompleteSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-        return AppointmentSerializer(instance).to_representation(instance)
+        return AppointmentSerializer(instance, context=self.context).to_representation(instance)
 
     def validate(self, attrs):
         if not self.instance.can_complete():
@@ -134,6 +136,7 @@ class AppointmentCompleteSerializer(serializers.ModelSerializer):
         self.instance.save()
         return instance
 
+
 class AppointmentCancelSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -141,7 +144,7 @@ class AppointmentCancelSerializer(serializers.ModelSerializer):
         fields = []
 
     def to_representation(self, instance):
-        return AppointmentSerializer(instance).to_representation(instance)
+        return AppointmentSerializer(instance, context=self.context).to_representation(instance)
 
     def validate(self, attrs):
         if not self.instance.can_cancel():

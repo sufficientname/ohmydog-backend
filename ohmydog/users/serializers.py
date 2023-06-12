@@ -59,7 +59,7 @@ class UserPasswordSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-        return UserSerializer(instance).to_representation(instance)
+        return UserSerializer(instance, context=self.context).to_representation(instance)
 
     def create(self, validated_data):
         raise NotImplementedError('`create()` must be implemented.')

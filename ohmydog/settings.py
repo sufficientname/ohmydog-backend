@@ -139,6 +139,12 @@ AUTH_USER_MODEL = "users.User"
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_HOST_USER = 'b105f6147e3a63'
+EMAIL_HOST_PASSWORD = '7c44ebc2cacc13'
+EMAIL_PORT = '2525'
+
 EMAIL_DEFAULT_FROM = "contacto@ohmydog.com.ar"
 
 REST_FRAMEWORK = {
