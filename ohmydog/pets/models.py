@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 
 import datetime
-
+from dateutil import relativedelta
 
 class Pet(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False)
@@ -16,6 +16,12 @@ class Pet(models.Model):
 
     def __str__(self):
         return f'{self.name} ({self.age_months()})'
+
+    def age_at(self, date):
+        return relativedelta.relativedelta(date, self.birthdate)
+
+    def age(self):
+        return self.age_at(datetime.date.today())
 
     def _age(self):
         return datetime.date.today() - self.birthdate

@@ -2,7 +2,6 @@ from django.db import models
 from django.conf import settings
 
 import datetime
-import decimal
 
 from ohmydog.appointments import constants
 from ohmydog.appointments import exceptions
@@ -13,10 +12,10 @@ class AppointmentManager(models.Manager):
     def create_appointment_request(self, user, pet, reason, date, timeslot):        
         days_to_booster = 0
         if reason == constants.REASON_VACCINATION_A:
-            days_to_booster = check_vaccine_a(pet)
+            days_to_booster = check_vaccine_a(pet, date)
 
         elif reason == constants.REASON_VACCINATION_B:
-            days_to_booster = check_vaccine_b(pet)
+            days_to_booster = check_vaccine_b(pet, date)
 
         appointment = self.model(
             user=user,
@@ -29,6 +28,7 @@ class AppointmentManager(models.Manager):
         appointment.save()
 
         return appointment
+
 
 class Appointment(models.Model):
     objects = AppointmentManager()
@@ -53,7 +53,7 @@ class Appointment(models.Model):
     def can_accept(self):
         return (
             self.status == constants.STATUS_PENDING and
-            self.date > datetime.date.today()
+            self.date >= datetime.date.today()
         )
 
     def accept(self, hour):
@@ -65,7 +65,7 @@ class Appointment(models.Model):
     def can_reject(self):
         return (
             (self.status == constants.STATUS_PENDING) and
-            (self.date > datetime.date.today())
+            (self.date >= datetime.date.today())
         )
 
     def reject(self, suggestion_date):
@@ -77,7 +77,7 @@ class Appointment(models.Model):
     def can_cancel(self):
         return (
             (self.status in [constants.STATUS_PENDING, constants.STATUS_ACCEPTED]) and
-            (self.date > datetime.date.today())
+            (self.date >= datetime.date.today())
         )
 
     def cancel(self):
@@ -99,28 +99,48 @@ class Appointment(models.Model):
         self.observations = observations
 
 
+
+
+def get_last_appointment(pet, reason) -> Appointment:
+    status = constants.STATUS_COMPLETED
+    appointment = Appointment.objects.filter(
+        pet=pet,
+        reason=reason,
+        status=status
+    ).order_by('-date').first()
+    return appointment
     
 
-def check_vaccine_a(pet) -> int:
-    pet_months = pet.age_months()
+def check_vaccine_a(pet, date) -> int:
+    pet_age = pet.age_at(date)
 
     # menores a 2 meses no pueden recibir vacuna A
-    if pet_months < 2:
-        raise exceptions.BadReasonError("mascotas menores a 2 meses no pueden recibir vacuna de tipo A")
+    if pet_age.years == 0 and pet_age.months < 2:
+        raise exceptions.BadReasonError("Mascotas menores a 2 meses no pueden recibir vacuna de tipo A.")
+
+    last_appointment = get_last_appointment(pet, constants.REASON_VACCINATION_A)
+    if last_appointment and last_appointment.booster_date() > date:
+        raise exceptions.BadReasonError(f"Esta mascota ya recibio una vacuna de tipo A en los ultimos {last_appointment.days_to_booster} dias. Solicite un turno a partir del dia {last_appointment.booster_date()}.")
 
     # entre 2 y 4 meses necesitan refuerzo a los 21 dias
-    if pet_months <= 4:
+    if (pet_age.years == 0 and pet_age.months <= 4):
         return 21
 
     # mayores a 4 meses necesitan refuerzo a los 365 dias
     return 365
-    
-def check_vaccine_b(pet):
-    pet_months = pet.age_months()
+
+
+def check_vaccine_b(pet, date) -> int:
+    pet_age = pet.age_at(date)
 
     # menores a 4 meses no pueden recibir vacuna tipo B
-    if pet_months < 4:
-        raise exceptions.BadReasonError("mascotas menores a 4 meses no pueden recibir vacuna de tipo B")
+    if pet_age.years == 0 and pet_age.months < 4:
+        raise exceptions.BadReasonError("Mascotas menores a 4 meses no pueden recibir vacuna de tipo B.")
+
+    last_appointment = get_last_appointment(pet, constants.REASON_VACCINATION_B)
+    if last_appointment and last_appointment.booster_date() > date:
+        raise exceptions.BadReasonError(
+            f"Esta mascota ya recibio una vacuna de tipo B en los ultimos {last_appointment.days_to_booster} dias. Solicite un turno a partir del dia {last_appointment.booster_date()}.")
 
     # mayores a 4 meses necesitan refuerzo a los 365 dias
     return 365

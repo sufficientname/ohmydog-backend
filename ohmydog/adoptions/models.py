@@ -3,6 +3,7 @@ from django.conf import settings
 
 from ohmydog.adoptions import constants
 
+
 class AdoptionAd(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False)
     pet_name = models.CharField(max_length=32, null=True)

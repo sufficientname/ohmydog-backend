@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from ohmydog.appointments.models import Appointment
 from ohmydog.appointments import exceptions
-from ohmydog.appointments import constants
+
 
 class AppointmentSerializer(serializers.ModelSerializer):
     pet_name = serializers.SerializerMethodField()
