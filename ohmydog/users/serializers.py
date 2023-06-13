@@ -4,7 +4,12 @@ from django.conf import settings
 from django.contrib.auth import update_session_auth_hash
 from django.core.mail import send_mail
 
+import phonenumbers
+import datetime
+from dateutil import relativedelta
+
 from ohmydog.users.models import User
+from ohmydog.users import constants
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -25,6 +30,20 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'is_staff',
         ]
+
+    def validate_birthdate(self, value):
+        today = datetime.date.today()
+        age = relativedelta.relativedelta(today, value)
+        if age.years < constants.MIN_USER_AGE:
+            raise serializers.ValidationError("Solo se permiten usuarios de 18 o mas años de edad.")
+        return value
+
+    def validate_phone_number(self, value):
+        try:
+            phonenumbers.parse(value, _check_region=False)
+        except phonenumbers.NumberParseException:
+            raise serializers.ValidationError("Introduzca una número de teléfono válido.")
+        return value
 
     def create(self, validated_data):
         password = make_random_password()

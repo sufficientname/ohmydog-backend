@@ -1,0 +1,1 @@
+MIN_USER_AGE = 18
