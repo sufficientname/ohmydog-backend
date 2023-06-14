@@ -40,7 +40,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate_phone_number(self, value):
         try:
-            phonenumbers.parse(value, _check_region=False)
+            phonenumbers.parse(value)
         except phonenumbers.NumberParseException:
             raise serializers.ValidationError("Introduzca una número de teléfono válido.")
         return value

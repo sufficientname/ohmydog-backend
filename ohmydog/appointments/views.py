@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 
 from ohmydog import permissions
 from ohmydog.appointments.models import Appointment
+from ohmydog.appointments.filters import AppointmentFilter
 from ohmydog.appointments.serializers import (
     AppointmentSerializer,
     AppointmentRequestSerializer,
@@ -47,10 +48,10 @@ class AppointmentAdminViewSet(mixins.RetrieveModelMixin,
                               mixins.ListModelMixin,
                               viewsets.GenericViewSet):
     permission_classes = [permissions.IsAdminUser]
-    filterset_fields = ['pet', 'status']
+    # filterset_fields = ['pet', 'status', 'date']
+    filterset_class = AppointmentFilter
 
     def get_queryset(self):
-        today = datetime.date.today()
         return Appointment.objects.all().order_by('date', 'hour')
     
     def get_serializer_class(self):
