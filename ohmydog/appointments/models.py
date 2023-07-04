@@ -56,8 +56,8 @@ class Appointment(models.Model):
             self.date >= datetime.date.today()
         )
 
-    def accept(self, hour):
-        if not self.can_accept():
+    def accept(self, hour, check=True):
+        if check and not self.can_accept():
             return
         self.status = constants.STATUS_ACCEPTED
         self.hour = hour
@@ -68,8 +68,8 @@ class Appointment(models.Model):
             (self.date >= datetime.date.today())
         )
 
-    def reject(self, suggestion_date):
-        if not self.can_reject():
+    def reject(self, suggestion_date, check=True):
+        if check and not self.can_reject():
             return
         self.status = constants.STATUS_REJECTED
         self.suggestion_date = suggestion_date
@@ -80,8 +80,8 @@ class Appointment(models.Model):
             (self.date >= datetime.date.today())
         )
 
-    def cancel(self):
-        if not self.can_cancel():
+    def cancel(self, check=False):
+        if check and not self.can_cancel():
             return
         self.status = constants.STATUS_CANCELED
 
@@ -91,8 +91,8 @@ class Appointment(models.Model):
             (self.date <= datetime.date.today())
         )
 
-    def complete(self, price, observations):
-        if not self.can_complete():
+    def complete(self, price, observations, check=True):
+        if check and not self.can_complete():
             return
         self.status = constants.STATUS_COMPLETED
         self.price = price

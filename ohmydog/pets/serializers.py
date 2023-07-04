@@ -4,7 +4,6 @@ from ohmydog.pets.models import Pet
 
 class PetSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    age = serializers.SerializerMethodField()
 
     class Meta:
         model = Pet
@@ -15,12 +14,14 @@ class PetSerializer(serializers.ModelSerializer):
             'breed',
             'color',
             'birthdate',
-            'age',
         ]
 
-    def get_age(self, instance: Pet):
-        age = instance.age()
-        return {'days': age.days, 'months': age.months, 'years': age.years}
+    def validate_name(self, value):
+        user = self.context['request'].user
+        if self.Meta.model.objects.filter(name=value, user=user).exists():
+            raise serializers.ValidationError("Ya existe un/a mascota con este/a nombre.")
+        return value
+
 
 class PetAdminSerializer(serializers.ModelSerializer):
     user_fullname = serializers.SerializerMethodField()

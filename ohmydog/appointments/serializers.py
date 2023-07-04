@@ -1,4 +1,8 @@
 from rest_framework import serializers
+
+from django.conf import settings
+from django.core.mail import send_mail
+
 from ohmydog.appointments.models import Appointment
 from ohmydog.appointments import exceptions
 
@@ -62,7 +66,18 @@ class AppointmentRequestSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         try:
-            return self.Meta.model.objects.create_appointment_request(**validated_data)
+            appointmet = self.Meta.model.objects.create_appointment_request(**validated_data)
+           
+            send_mail(
+                'Creaste una solicitud de turno en Oh my dog!',
+                f'Los datos del turno solicitado son:\n mascota: {appointmet.pet.name}\n fecha: {appointmet.date}\n motivo: {appointmet.reason}\n franja horaria: {appointmet.timeslot}',
+                settings.EMAIL_DEFAULT_FROM,
+                [appointmet.user.email],
+                fail_silently=True,
+            )
+
+            return appointmet
+
         except exceptions.BadReasonError as e:
             raise serializers.ValidationError({'non_field_errors': [str(e)]})
 
@@ -87,6 +102,15 @@ class AppointmentAcceptSerializer(serializers.ModelSerializer):
     def update(self, instance: Appointment, validated_data):
         instance.accept(validated_data['hour'])
         instance.save()
+
+        send_mail(
+            'Tu solicitud de turno en Oh my dog! fue aceptada!',
+            f'Los datos del turno son:\n mascota: {instance.pet.name}\n fecha: {instance.date}\n motivo: {instance.reason}\n hora: {instance.hour}',
+            settings.EMAIL_DEFAULT_FROM,
+            [instance.user.email],
+            fail_silently=True,
+        )
+        
         return instance
 
 
@@ -110,6 +134,15 @@ class AppointmentRejectSerializer(serializers.ModelSerializer):
     def update(self, instance: Appointment, validated_data):
         instance.reject(validated_data['suggestion_date'])
         self.instance.save()
+
+        send_mail(
+            'Tu solicutud de turno en Oh my dog! fue rechazada!',
+            f'Tu solicitud de turno con los datos:\n mascota: {instance.pet.name}\n fecha: {instance.date}\n motivo: {instance.reason}\n hora: {instance.hour}\nfue rechazada.\nTe sugerimos que pidas un turno para la fecha: {instance.suggestion_date}',
+            settings.EMAIL_DEFAULT_FROM,
+            [instance.user.email],
+            fail_silently=True,
+        )
+
         return instance
 
 

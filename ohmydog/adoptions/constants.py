@@ -1,8 +1,8 @@
 from ohmydog.utils.choices import choice, make_choices
 
 
-GENDER_MALE = 'MALE'
-GENDER_FEMALE = 'FEMALE'
+GENDER_MALE = 'MACHO'
+GENDER_FEMALE = 'HEMBRA'
 
 GENDERS = {
     GENDER_MALE: choice(GENDER_MALE, 'Macho'),
@@ -12,9 +12,9 @@ GENDERS = {
 GENDER_CHOICES = make_choices(GENDERS)
 
 
-SIZE_SMALL = 'SMALL'
-SIZE_MEDIUM = 'MEDIUM'
-SIZE_BIG = 'BIG'
+SIZE_SMALL = 'PEQUENO'
+SIZE_MEDIUM = 'MEDIANO'
+SIZE_BIG = 'GRANDE'
 
 SIZES = {
     SIZE_SMALL: choice(SIZE_SMALL, 'Pequeño'),

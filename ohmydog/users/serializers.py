@@ -39,10 +39,13 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
     def validate_phone_number(self, value):
+        number = value
+        if not number.startswith("+54"):
+            number = f"+54 {number}"
         try:
-            phonenumbers.parse(value)
+            phonenumbers.parse(number)
         except phonenumbers.NumberParseException:
-            raise serializers.ValidationError("Introduzca una número de teléfono válido.")
+            raise serializers.ValidationError("Introduzca un número de teléfono válido.")
         return value
 
     def create(self, validated_data):
