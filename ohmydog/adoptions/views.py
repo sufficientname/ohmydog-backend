@@ -16,6 +16,7 @@ class AdoptionAdViewSet(mixins.CreateModelMixin,
                               mixins.ListModelMixin,
                               viewsets.GenericViewSet):
     permission_classes = [permissions.IsCustomerUserOrReadOnly]
+    filterset_fields = ['user', 'status']
 
     def get_queryset(self):
         return AdoptionAd.objects.all()
@@ -52,6 +53,7 @@ class AdoptionAdAdminViewSet(mixins.RetrieveModelMixin,
                              mixins.ListModelMixin,
                              viewsets.GenericViewSet):
     permission_classes = [permissions.IsAdminUser]
+    filterset_fields = ['user', 'status']
 
     def get_queryset(self):
         return AdoptionAd.objects.all()
