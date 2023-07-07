@@ -176,10 +176,10 @@ class AppointmentCompleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
         fields = [
-            'observations'
+            'observations',
             'price',
-            'weight'
-            'update_health_record'
+            'weight',
+            'update_health_record',
         ]
 
     def to_representation(self, instance):
@@ -196,7 +196,8 @@ class AppointmentCompleteSerializer(serializers.ModelSerializer):
             self.instance.save()
             
             if validated_data['update_health_record']:
-                entries = instance.make_health_record_entries()
+                entries = instance.make_health_record_entries(validated_data['weight'])
+                import pdb; pdb.set_trace()
                 HealthRecordEntry.objects.bulk_create(entries)
 
             return instance

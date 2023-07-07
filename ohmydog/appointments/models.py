@@ -47,7 +47,7 @@ class Appointment(models.Model):
     price = models.DecimalField(max_digits=16 ,decimal_places=2, null=False, default=0)
 
     def is_vaccinantion(self):
-        return self.status in constants.VACCINATION_REASONS
+        return self.reason in constants.VACCINATION_REASONS
 
     def get_vaccine(self):
         if self.status == constants.REASON_VACCINATION_A:
