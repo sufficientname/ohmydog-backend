@@ -8,8 +8,10 @@ from ohmydog.adoptions.models import AdoptionAd
 from ohmydog.adoptions.serializers import (
     AdoptionAdSerializer,
     AdoptionAdCancelSerializer,
-    AdoptionAdCompleteSerializer
+    AdoptionAdCompleteSerializer,
+    AdoptionAdContactSerializer,
 )
+
 
 class AdoptionAdViewSet(mixins.CreateModelMixin,
                               mixins.RetrieveModelMixin,
@@ -26,6 +28,8 @@ class AdoptionAdViewSet(mixins.CreateModelMixin,
             return AdoptionAdCancelSerializer
         if self.action == 'complete':
             return AdoptionAdCompleteSerializer
+        if self.action == 'contact':
+            return AdoptionAdContactSerializer
         return AdoptionAdSerializer
     
     @action(methods=['POST'], detail=True, url_path='cancel')
@@ -42,6 +46,16 @@ class AdoptionAdViewSet(mixins.CreateModelMixin,
     def complete(self, request, pk=None):
         ad = self.get_object()
         if ad.user != request.user:
+            raise PermissionDenied()
+        serializer = self.get_serializer(ad, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    @action(methods=['POST'], detail=True, url_path='contact', permission_classes=[])
+    def contact(self, request, pk=None):
+        ad = self.get_object()
+        if ad.user == request.user:
             raise PermissionDenied()
         serializer = self.get_serializer(ad, data=request.data)
         serializer.is_valid(raise_exception=True)

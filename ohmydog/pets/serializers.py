@@ -1,4 +1,7 @@
 from rest_framework import serializers
+
+from django.utils.translation import gettext_lazy as _
+
 from ohmydog.pets.models import Pet
 
 
@@ -19,7 +22,7 @@ class PetSerializer(serializers.ModelSerializer):
     def validate_name(self, value):
         user = self.context['request'].user
         if self.Meta.model.objects.filter(name=value, user=user).exists():
-            raise serializers.ValidationError("Ya existe un/a mascota con este/a nombre.")
+            raise serializers.ValidationError(_('Ya existe una mascota con este nombre.'))
         return value
 
 

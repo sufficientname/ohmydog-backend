@@ -27,7 +27,12 @@ class UserMePasswordApiView(generics.GenericAPIView):
         return Response(serializer.data)
 
 class AdminUserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.filter(is_staff=False).order_by('-date_joined')
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAdminUser]
     filterset_fields = ['id_number']
+
+    def get_queryset(self):
+        queryset = User.objects.filter(is_staff=False).order_by('-date_joined')
+        if self.action == 'list':
+            queryset = queryset.filter(is_active=True)
+        return queryset

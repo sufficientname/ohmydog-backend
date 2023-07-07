@@ -28,3 +28,6 @@ class AdoptionAd(models.Model):
         if not self.can_complete():
             return
         self.status = constants.STATUS_COMPLETED
+
+    def can_contact(self):
+        return self.status == constants.STATUS_PUBLISHED

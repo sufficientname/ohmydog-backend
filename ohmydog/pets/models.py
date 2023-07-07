@@ -4,6 +4,7 @@ from django.conf import settings
 import datetime
 from dateutil import relativedelta
 
+
 class Pet(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False)
     name = models.CharField(max_length=32, null=False, blank=False)
@@ -12,7 +13,7 @@ class Pet(models.Model):
     birthdate = models.DateField(null=False)
 
     class Meta:
-        unique_together = [["name", "user"]]
+        unique_together = [['name', 'user']]
 
     def __str__(self):
         return f'{self.name} ({self.age_months()})'

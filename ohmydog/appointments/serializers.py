@@ -1,9 +1,12 @@
 from rest_framework import serializers
 
 from django.conf import settings
+from django.db import transaction
 from django.core.mail import send_mail
+from django.utils.translation import gettext_lazy as _
 
-from ohmydog.appointments.models import Appointment
+from ohmydog.appointments.models import Appointment, HealthRecordEntry
+from ohmydog.appointments import constants
 from ohmydog.appointments import exceptions
 
 
@@ -61,7 +64,7 @@ class AppointmentRequestSerializer(serializers.ModelSerializer):
 
     def validate_pet(self, value):
         if value.user_id != self.context['request'].user.id:
-            raise serializers.ValidationError("invalid pet")
+            raise serializers.ValidationError(_('Esta mascota no te pertenece'))
         return value
 
     def create(self, validated_data):
@@ -69,8 +72,14 @@ class AppointmentRequestSerializer(serializers.ModelSerializer):
             appointmet = self.Meta.model.objects.create_appointment_request(**validated_data)
            
             send_mail(
-                'Creaste una solicitud de turno en Oh my dog!',
-                f'Los datos del turno solicitado son:\n mascota: {appointmet.pet.name}\n fecha: {appointmet.date}\n motivo: {appointmet.reason}\n franja horaria: {appointmet.timeslot}',
+                _('Creaste una solicitud de turno en Oh my dog!'),
+                _('Los datos del turno solicitado son:\n mascota: %(pet_name)s\n fecha: %(date)s\n motivo: %(reason)s\n franja horaria: %(timeslot)s')
+                    % dict(
+                        pet_name=appointmet.pet.name,
+                        date=appointmet.date,
+                        reason=appointmet.reason,
+                        timeslot=appointmet.timeslot
+                    ),
                 settings.EMAIL_DEFAULT_FROM,
                 [appointmet.user.email],
                 fail_silently=True,
@@ -96,7 +105,7 @@ class AppointmentAcceptSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if not self.instance.can_accept():
-            raise serializers.ValidationError("Este turno no puede ser aprobado")
+            raise serializers.ValidationError(_('Este turno no puede ser aprobado'))
         return attrs
 
     def update(self, instance: Appointment, validated_data):
@@ -104,8 +113,14 @@ class AppointmentAcceptSerializer(serializers.ModelSerializer):
         instance.save()
 
         send_mail(
-            'Tu solicitud de turno en Oh my dog! fue aceptada!',
-            f'Los datos del turno son:\n mascota: {instance.pet.name}\n fecha: {instance.date}\n motivo: {instance.reason}\n hora: {instance.hour}',
+            _('Tu solicitud de turno en Oh my dog! fue aceptada'),
+            _('Los datos del turno son:\n mascota: %(pet_name)s\n fecha: %(date)s\n motivo: %(reason)s\n hora: %(hour)s')
+                % dict(
+                    pet_name=instance.pet.name,
+                    date=instance.date,
+                    reason=instance.reason,
+                    hour=instance.hour
+                ),
             settings.EMAIL_DEFAULT_FROM,
             [instance.user.email],
             fail_silently=True,
@@ -128,7 +143,7 @@ class AppointmentRejectSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if not self.instance.can_reject():
-            raise serializers.ValidationError("Este turno no puede ser rechazado")
+            raise serializers.ValidationError(_('Este turno no puede ser rechazado'))
         return attrs
 
     def update(self, instance: Appointment, validated_data):
@@ -136,8 +151,15 @@ class AppointmentRejectSerializer(serializers.ModelSerializer):
         self.instance.save()
 
         send_mail(
-            'Tu solicutud de turno en Oh my dog! fue rechazada!',
-            f'Tu solicitud de turno con los datos:\n mascota: {instance.pet.name}\n fecha: {instance.date}\n motivo: {instance.reason}\n hora: {instance.hour}\nfue rechazada.\nTe sugerimos que pidas un turno para la fecha: {instance.suggestion_date}',
+            _('Tu solicutud de turno en Oh my dog! fue rechazada'),
+            _('Tu solicitud de turno con los datos:\n mascota: %(pet_name)s\n fecha: %(date)s\n motivo: %(reason)s\n hora: %(hour)s\nfue rechazada.\nTe sugerimos que pidas un turno para la fecha: %(suggestion_date)s')
+                % dict(
+                    pet_name=instance.pet.name,
+                    date=instance.date,
+                    reason=instance.reason,
+                    hour=instance.hour,
+                    suggestion_date=instance.suggestion_date
+                ),
             settings.EMAIL_DEFAULT_FROM,
             [instance.user.email],
             fail_silently=True,
@@ -148,12 +170,16 @@ class AppointmentRejectSerializer(serializers.ModelSerializer):
 
 class AppointmentCompleteSerializer(serializers.ModelSerializer):
     price = serializers.DecimalField(max_digits=16 ,decimal_places=2, min_value=0)
+    weight = serializers.DecimalField(max_digits=16, decimal_places=2, min_value=0)
+    update_health_record = serializers.BooleanField()
 
     class Meta:
         model = Appointment
         fields = [
-            'price',
             'observations'
+            'price',
+            'weight'
+            'update_health_record'
         ]
 
     def to_representation(self, instance):
@@ -161,13 +187,19 @@ class AppointmentCompleteSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if not self.instance.can_complete():
-            raise serializers.ValidationError("Este turno no puede ser completado")
+            raise serializers.ValidationError(_('Este turno no puede ser completado'))
         return attrs
 
     def update(self, instance: Appointment, validated_data):
-        instance.complete(validated_data['price'], validated_data['observations'])
-        self.instance.save()
-        return instance
+        with transaction.atomic():
+            instance.complete(validated_data['price'], validated_data['observations'])
+            self.instance.save()
+            
+            if validated_data['update_health_record']:
+                entries = instance.make_health_record_entries()
+                HealthRecordEntry.objects.bulk_create(entries)
+
+            return instance
 
 
 class AppointmentCancelSerializer(serializers.ModelSerializer):
@@ -181,7 +213,7 @@ class AppointmentCancelSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if not self.instance.can_cancel():
-            raise serializers.ValidationError("Este turno no puede ser cancelado")
+            raise serializers.ValidationError(_('Este turno no puede ser cancelado'))
         return attrs
 
     def update(self, instance: Appointment, validated_data):

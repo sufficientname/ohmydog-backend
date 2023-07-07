@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
 import datetime
 
@@ -44,6 +45,16 @@ class Appointment(models.Model):
     observations = models.TextField(null=False)
     days_to_booster = models.PositiveIntegerField(null=False)
     price = models.DecimalField(max_digits=16 ,decimal_places=2, null=False, default=0)
+
+    def is_vaccinantion(self):
+        return self.status in constants.VACCINATION_REASONS
+
+    def get_vaccine(self):
+        if self.status == constants.REASON_VACCINATION_A:
+            return constants.VACCINE_A
+        if self.status == constants.REASON_VACCINATION_B:
+            return constants.VACCINE_B
+        return None
 
     def booster_date(self):
         if not self.days_to_booster:
@@ -98,7 +109,35 @@ class Appointment(models.Model):
         self.price = price
         self.observations = observations
 
+    def make_health_record_entries(self, weight):
+        entries = []
 
+        weight_entry = HealthRecordEntry(
+            pet=self.pet,
+            date=self.date,
+            entry_type=constants.ENTRY_TYPE_WEIGHT,
+            weight=weight,
+        )
+        entries.append(weight_entry)
+
+        if self.is_vaccinantion():
+            vaccine_entry = HealthRecordEntry(
+                pet=self.pet,
+                date=self.date,
+                entry_type=constants.ENTRY_TYPE_WEIGHT,
+                vaccine=self.get_vaccine(),
+            )
+            entries.append(vaccine_entry)
+
+        return entries
+
+
+class HealthRecordEntry(models.Model):
+    pet = models.ForeignKey('pets.Pet', on_delete=models.CASCADE, null=False)
+    date = models.DateField(null=False)
+    entry_type = models.CharField(max_length=16, choices=constants.ENTRY_TYPE_CHOICES)
+    vaccine = models.CharField(max_length=16, null=True)
+    weight = models.DecimalField(max_digits=16, decimal_places=2, null=True)
 
 
 def get_last_appointment(pet, reason) -> Appointment:

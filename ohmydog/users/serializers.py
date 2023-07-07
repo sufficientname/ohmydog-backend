@@ -3,16 +3,18 @@ from rest_framework import serializers
 from django.conf import settings
 from django.contrib.auth import update_session_auth_hash
 from django.core.mail import send_mail
+from django.utils.translation import gettext_lazy as _
 
-import phonenumbers
 import datetime
 from dateutil import relativedelta
 
 from ohmydog.users.models import User
 from ohmydog.users import constants
+from ohmydog.serializer_fields import PhoneNumberField
 
 
 class UserSerializer(serializers.ModelSerializer):
+    phone_number = PhoneNumberField()
 
     class Meta:
         model = User
@@ -22,6 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'is_staff',
+            'is_active',
             'id_number',
             'phone_number',
             'birthdate',
@@ -35,17 +38,7 @@ class UserSerializer(serializers.ModelSerializer):
         today = datetime.date.today()
         age = relativedelta.relativedelta(today, value)
         if age.years < constants.MIN_USER_AGE:
-            raise serializers.ValidationError("Solo se permiten usuarios de 18 o mas años de edad.")
-        return value
-
-    def validate_phone_number(self, value):
-        number = value
-        if not number.startswith("+54"):
-            number = f"+54 {number}"
-        try:
-            phonenumbers.parse(number)
-        except phonenumbers.NumberParseException:
-            raise serializers.ValidationError("Introduzca un número de teléfono válido.")
+            raise serializers.ValidationError(_('Solo se permiten usuarios de 18 o mas años de edad.'))
         return value
 
     def create(self, validated_data):
@@ -63,8 +56,11 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
         send_mail(
-            'Bienvenido a Oh my dog!',
-            f'Su contraseña es {password}',
+            _('Bienvenido a Oh my dog!'),
+            _('Su contraseña es %(password)s.')
+                % dict(
+                    password=password
+                ),
             settings.EMAIL_DEFAULT_FROM,
             [user.email],
             fail_silently=True,
@@ -82,9 +78,6 @@ class UserPasswordSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return UserSerializer(instance, context=self.context).to_representation(instance)
-
-    def create(self, validated_data):
-        raise NotImplementedError('`create()` must be implemented.')
 
     def update(self, instance, validated_data):
         instance.set_password(validated_data['password'])

@@ -81,7 +81,7 @@ class AppointmentAdminViewSet(mixins.RetrieveModelMixin,
         serializer.save()
         return Response(serializer.data)
 
-    @action(methods=['POST'], detail=True, url_path="complete")
+    @action(methods=['POST'], detail=True, url_path='complete')
     def complete(self, request, pk=None):
         appointment = self.get_object()
         serializer = self.get_serializer(appointment, data=request.data)

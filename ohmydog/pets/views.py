@@ -13,9 +13,6 @@ class PetViewSet(viewsets.ModelViewSet):
         user = self.request.user
         return Pet.objects.filter(user_id=user)
 
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
-
 
 class PetAdminViewSet(viewsets.ModelViewSet):
     serializer_class = PetAdminSerializer
