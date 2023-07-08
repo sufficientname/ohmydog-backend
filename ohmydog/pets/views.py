@@ -11,7 +11,7 @@ class PetViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return Pet.objects.filter(user_id=user)
+        return Pet.objects.filter(user=user)
 
 
 class PetAdminViewSet(viewsets.ModelViewSet):

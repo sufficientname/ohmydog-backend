@@ -131,15 +131,6 @@ class Appointment(models.Model):
 
         return entries
 
-
-class HealthRecordEntry(models.Model):
-    pet = models.ForeignKey('pets.Pet', on_delete=models.CASCADE, null=False)
-    date = models.DateField(null=False)
-    entry_type = models.CharField(max_length=16, choices=constants.ENTRY_TYPE_CHOICES)
-    vaccine = models.CharField(max_length=16, null=True)
-    weight = models.DecimalField(max_digits=16, decimal_places=2, null=True)
-
-
 def get_last_appointment(pet, reason) -> Appointment:
     status = constants.STATUS_COMPLETED
     appointment = Appointment.objects.filter(

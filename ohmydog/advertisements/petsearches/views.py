@@ -4,16 +4,16 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 
 from ohmydog import permissions
-from ohmydog.adoptions.models import AdoptionAd
-from ohmydog.adoptions.serializers import (
-    AdoptionAdSerializer,
-    AdoptionAdCancelSerializer,
-    AdoptionAdCompleteSerializer,
-    AdoptionAdContactSerializer,
+from ohmydog.advertisements.petsearches.models import PetSearchAd
+from ohmydog.advertisements.petsearches.serializers import (
+    PetSearchAdSerializer,
+    PetSearchAdCancelSerializer,
+    PetSearchAdCompleteSerializer,
+    PetSearchAdContactSerializer,
 )
 
 
-class AdoptionAdViewSet(mixins.CreateModelMixin,
+class PetSearchAdViewSet(mixins.CreateModelMixin,
                               mixins.RetrieveModelMixin,
                               mixins.ListModelMixin,
                               viewsets.GenericViewSet):
@@ -21,17 +21,17 @@ class AdoptionAdViewSet(mixins.CreateModelMixin,
     filterset_fields = ['user', 'status']
 
     def get_queryset(self):
-        return AdoptionAd.objects.all()
+        return PetSearchAd.objects.all()
     
     def get_serializer_class(self):
         if self.action == 'cancel':
-            return AdoptionAdCancelSerializer
+            return PetSearchAdCancelSerializer
         if self.action == 'complete':
-            return AdoptionAdCompleteSerializer
+            return PetSearchAdCompleteSerializer
         if self.action == 'contact':
-            return AdoptionAdContactSerializer
-        return AdoptionAdSerializer
-    
+            return PetSearchAdContactSerializer
+        return PetSearchAdSerializer
+
     @action(methods=['POST'], detail=True, url_path='cancel')
     def cancel(self, request, pk=None):
         ad = self.get_object()
@@ -63,14 +63,14 @@ class AdoptionAdViewSet(mixins.CreateModelMixin,
         return Response(serializer.data)
 
 
-class AdoptionAdAdminViewSet(mixins.RetrieveModelMixin,
+class PetSearchAdAdminViewSet(mixins.RetrieveModelMixin,
                              mixins.ListModelMixin,
                              viewsets.GenericViewSet):
     permission_classes = [permissions.IsAdminUser]
     filterset_fields = ['user', 'status']
 
     def get_queryset(self):
-        return AdoptionAd.objects.all()
+        return PetSearchAd.objects.all()
 
     def get_serializer_class(self):
-        return AdoptionAdSerializer
+        return PetSearchAdSerializer

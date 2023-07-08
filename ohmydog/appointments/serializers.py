@@ -5,7 +5,7 @@ from django.db import transaction
 from django.core.mail import send_mail
 from django.utils.translation import gettext_lazy as _
 
-from ohmydog.appointments.models import Appointment, HealthRecordEntry
+from ohmydog.appointments.models import Appointment
 from ohmydog.appointments import constants
 from ohmydog.appointments import exceptions
 
@@ -20,7 +20,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
             'id',
             'user',
             'user_fullname',
-            'pet_id',
+            'pet',
             'pet_name',
             'reason',
             'date',
@@ -63,7 +63,7 @@ class AppointmentRequestSerializer(serializers.ModelSerializer):
         return AppointmentSerializer(instance, context=self.context).to_representation(instance)
 
     def validate_pet(self, value):
-        if value.user_id != self.context['request'].user.id:
+        if value.user.id != self.context['request'].user.id:
             raise serializers.ValidationError(_('Esta mascota no te pertenece'))
         return value
 
@@ -198,7 +198,7 @@ class AppointmentCompleteSerializer(serializers.ModelSerializer):
             if validated_data['update_health_record']:
                 entries = instance.make_health_record_entries(validated_data['weight'])
                 import pdb; pdb.set_trace()
-                HealthRecordEntry.objects.bulk_create(entries)
+                # HealthRecordEntry.objects.bulk_create(entries)
 
             return instance
 

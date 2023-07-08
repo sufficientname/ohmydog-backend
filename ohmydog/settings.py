@@ -48,7 +48,9 @@ INSTALLED_APPS = [
     'ohmydog.users',
     'ohmydog.pets',
     'ohmydog.appointments',
-    'ohmydog.adoptions',
+    'ohmydog.advertisements.adoptions',
+    'ohmydog.advertisements.petsearches',
+    'ohmydog.advertisements.petsitters',
 ]
 
 MIDDLEWARE = [

@@ -11,11 +11,10 @@ class PhoneNumberField(serializers.CharField):
 
 
 def validate_phonenumber(value):
-    number = value
-    if not number.startswith("+54"):
-        number = f"+54 {number}"
     try:
-        phonenumbers.parse(number)
+        number = phonenumbers.parse(value, region='AR')
+        if not phonenumbers.is_valid_number(number):
+            raise serializers.ValidationError(_('Introduzca un número de teléfono válido.'))
     except phonenumbers.NumberParseException:
         raise serializers.ValidationError(_('Introduzca un número de teléfono válido.'))
     return value

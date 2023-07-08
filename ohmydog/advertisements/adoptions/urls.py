@@ -1,6 +1,6 @@
 from django.urls import include, path
 from rest_framework import routers
-from ohmydog.adoptions import views
+from ohmydog.advertisements.adoptions import views
 
 router = routers.DefaultRouter()
 router.register('adoptions', views.AdoptionAdViewSet, basename='adoption')

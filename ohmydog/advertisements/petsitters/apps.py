@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class AdoptionsConfig(AppConfig):
+class PetSittersConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'ohmydog.adoptions'
+    name = 'ohmydog.advertisements.petsitters'

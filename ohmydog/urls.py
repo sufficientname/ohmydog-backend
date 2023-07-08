@@ -25,5 +25,7 @@ urlpatterns = [
 
     path('', include('ohmydog.pets.urls', namespace='pets')),
     path('', include('ohmydog.appointments.urls', namespace='appointments')),
-    path('', include('ohmydog.adoptions.urls', namespace='adoptions'))
+    path('', include('ohmydog.advertisements.adoptions.urls', namespace='adoptions')),
+    path('', include('ohmydog.advertisements.petsearches.urls', namespace='petsearches')),
+    path('', include('ohmydog.advertisements.petsitters.urls', namespace='petsitters')),
 ]
