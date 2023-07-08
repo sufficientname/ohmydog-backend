@@ -13,7 +13,7 @@ class PetSearchAdSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     is_mine = serializers.SerializerMethodField()
     pet_age = serializers.IntegerField(min_value=0)
-    pet_photo = serializers.ImageField(required=False, use_url=True)
+    # pet_photo = serializers.ImageField(required=False, use_url=True)
 
     class Meta:
         model = PetSearchAd
@@ -29,7 +29,7 @@ class PetSearchAdSerializer(serializers.ModelSerializer):
             'pet_size',
             'pet_color',
             'last_seen_area',
-            'pet_photo',
+            # 'pet_photo',
             'can_complete',
             'can_cancel',
             'can_contact',

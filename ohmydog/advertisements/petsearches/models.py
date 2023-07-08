@@ -12,4 +12,4 @@ class PetSearchAd(AbstractAd):
     pet_size = models.CharField(max_length=16, choices=constants.SIZE_CHOICES, null=False)
     pet_color = models.CharField(max_length=32, null=False)
     last_seen_area = models.CharField(max_length=512, null=False)
-    pet_photo = models.ImageField(upload_to='petsearches', null=True)
+    # pet_photo = models.ImageField(upload_to='petsearches', null=True)
