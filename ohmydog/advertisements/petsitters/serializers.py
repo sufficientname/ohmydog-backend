@@ -41,6 +41,26 @@ class PetSitterAdSerializer(serializers.ModelSerializer):
     def get_is_mine(self, instance: PetSitterAd):
         return instance.user == self.context['request'].user
 
+    def create(self, validated_data):
+        ad = super().create(validated_data)
+        send_mail(
+            _('Tu anuncio de servicio de paseadores o cuidadores fue publicado en Oh my dog!'),
+            _('Los datos del anuncio son:\n nombre: %(sitter_first_name)s\n apellido: %(sitter_last_name)s\n email: %(sitter_email)s\n telefono: %(sitter_phone_number)s\n servicio: %(service_type)s\n zona: %(service_area)s')
+                % dict(
+                    sitter_first_name=ad.sitter_first_name,
+                    sitter_last_name=ad.sitter_last_name,
+                    sitter_email=ad.sitter_email,
+                    sitter_phone_number=ad.sitter_phone_number,
+                    service_type=ad.service_type,
+                    service_area=ad.service_area,
+                ),
+            settings.EMAIL_DEFAULT_FROM,
+            [ad.sitter_email],
+            fail_silently=True,
+        )
+
+        return ad
+
 
 class PetSitterAdCompleteSerializer(serializers.ModelSerializer):
     class Meta:
