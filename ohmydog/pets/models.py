@@ -40,25 +40,35 @@ class Pet(models.Model):
         days = self.age_days()
         return int(days/365)
     
-    def _make_health_record_entry(self, date, entry_type, vaccine=None, weight=None):
+    def _make_health_record_entry(self, date, entry_type, vaccine=None, weight=None, appointment=None):
         return HealthRecordEntry(
             pet=self,
             date=date,
             entry_type=entry_type,
             vaccine=vaccine,
             weight=weight,
+            appointment=appointment,
         )
     
-    def make_vaccine_health_record_entry(self, date, vaccine):
-        return self._make_health_record_entry(date, constants.ENTRY_TYPE_VACCINE, vaccine=vaccine)
+    def make_vaccine_health_record_entry(self, date, vaccine, appointment=None):
+        return self._make_health_record_entry(date, constants.ENTRY_TYPE_VACCINE, vaccine=vaccine, appointment=appointment)
 
-    def make_weight_health_record_entry(self, date, weight):
-        return self._make_health_record_entry(date, constants.ENTRY_TYPE_WEIGHT, weight=weight)
+    def make_weight_health_record_entry(self, date, weight, appointment=None):
+        return self._make_health_record_entry(date, constants.ENTRY_TYPE_WEIGHT, weight=weight, appointment=appointment)
 
 
 class HealthRecordEntry(models.Model):
     pet = models.ForeignKey('pets.Pet', on_delete=models.CASCADE)
+    appointment = models.ForeignKey('appointments.Appointment', on_delete=models.CASCADE, null=True)
     date = models.DateField()
     entry_type = models.CharField(max_length=16, choices=constants.ENTRY_TYPE_CHOICES)
     vaccine = models.CharField(max_length=16, null=True)
     weight = models.DecimalField(max_digits=16, decimal_places=2, null=True)
+
+    @property
+    def entry_value(self):
+        if self.entry_type == constants.ENTRY_TYPE_VACCINE:
+            return self.vaccine
+        if self.entry_type == constants.ENTRY_TYPE_WEIGHT:
+            return self.weight
+        return None

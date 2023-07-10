@@ -196,7 +196,7 @@ class AppointmentCompleteSerializer(serializers.ModelSerializer):
             self.instance.save()
 
             if validated_data['update_health_record']:
-                health_record_entries = self.make_health_record_entries(validated_data['weight'])
+                health_record_entries = instance.make_health_record_entries(validated_data['weight'])
                 if health_record_entries:
                     instance.pet.healthrecordentry_set.bulk_create(health_record_entries)
 

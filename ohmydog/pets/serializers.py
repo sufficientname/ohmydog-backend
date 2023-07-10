@@ -7,6 +7,8 @@ from ohmydog.pets.models import Pet, HealthRecordEntry
 
 class PetSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    user_fullname = serializers.SerializerMethodField()
+    health_record = serializers.SerializerMethodField()
 
     class Meta:
         model = Pet
@@ -18,6 +20,7 @@ class PetSerializer(serializers.ModelSerializer):
             'breed',
             'color',
             'birthdate',
+            'health_record',
         ]
 
     def validate_name(self, value):
@@ -29,6 +32,10 @@ class PetSerializer(serializers.ModelSerializer):
     def get_user_fullname(self, instance: Pet):
         return f'{instance.user.first_name} {instance.user.last_name}'
 
+    def get_health_record(self, instance: Pet):
+        queryset = instance.healthrecordentry_set.all()
+        return HealthRecordEntrySerializer(queryset, many=True).data
+
 
 class HealthRecordEntrySerializer(serializers.ModelSerializer):
     class Meta:
@@ -38,6 +45,6 @@ class HealthRecordEntrySerializer(serializers.ModelSerializer):
             'pet',
             'date',
             'entry_type',
-            'vaccine',
-            'weight',
+            'entry_value',
         ]
+

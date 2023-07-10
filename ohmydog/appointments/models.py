@@ -103,17 +103,17 @@ class Appointment(models.Model):
         vaccine = self.get_vaccine()
         entries = []
         if weight:
-            weight_entry = self.pet.make_weight_health_record_entry(self.date, weight)
+            weight_entry = self.pet.make_weight_health_record_entry(self.date, weight, appointment=self)
             entries.append(weight_entry)
         if vaccine:
-            vaccine_entry = self.pet.make_vaccine_health_record_entry(self.date, vaccine)
+            vaccine_entry = self.pet.make_vaccine_health_record_entry(self.date, vaccine, appointment=self)
             entries.append(vaccine_entry)
         return entries
 
     def get_vaccine(self):
-        if self.status == constants.REASON_VACCINATION_A:
+        if self.reason == constants.REASON_VACCINATION_A:
             return constants.VACCINE_A
-        if self.status == constants.REASON_VACCINATION_B:
+        if self.reason == constants.REASON_VACCINATION_B:
             return constants.VACCINE_B
         return None
        

@@ -10,6 +10,8 @@ from ohmydog.campaigns.models import Campaign, CampaignDonation
 
 
 class CampaignSerializer(serializers.ModelSerializer):
+    donations = serializers.SerializerMethodField()
+
     class Meta:
         model = Campaign
         fields = [
@@ -24,13 +26,21 @@ class CampaignSerializer(serializers.ModelSerializer):
             'can_donate',
             'can_cancel',
             'can_complete',
+            'donations',
         ]
         read_only_fields = [
             'id',
             'status',
             'start_date',
             'current_amount',
+            'donations',
         ]
+
+    def get_donations(self, instance: Campaign):
+        if self.context['request'].user.is_staff:
+            queryset = instance.campaigndonation_set
+            return CampaignDonationSerializer(queryset, many=True).data
+        return []
 
 
 class CampaignCancelSerializer(serializers.ModelSerializer):
@@ -73,8 +83,8 @@ class CampaignCompleteSerializer(serializers.ModelSerializer):
 
 class CampaignDonateSerializer(serializers.ModelSerializer):
     amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=decimal.Decimal('0.01'))
-    donor_first_name = serializers.CharField(max_length=100)
-    donor_last_name = serializers.CharField(max_length=100)
+    donor_first_name = serializers.CharField(max_length=150)
+    donor_last_name = serializers.CharField(max_length=150)
     donor_email = serializers.EmailField()
     donor_phone_number = PhoneNumberField()
 
