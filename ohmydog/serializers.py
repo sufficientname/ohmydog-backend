@@ -39,6 +39,10 @@ class CreditCardSerializer(serializers.Serializer):
         return value
 
     def validate(self, attrs):
+        # expired card
+        if (attrs['expiration_date'] < datetime.date.today()):
+            raise serializers.ValidationError(_('La tarjeta esta vencida'))
+
         # invalid card
         FAKE_INVALID_CARD_NUMBER = '9999999999999999'
         FAKE_INVALID_CARD_CVV = '999'
@@ -50,9 +54,5 @@ class CreditCardSerializer(serializers.Serializer):
         FAKE_INSUFFICIENT_FUNDS_CARD_CVV = '888'
         if (attrs['card_number'] == FAKE_INSUFFICIENT_FUNDS_CARD_NUMBER) and (attrs['cvv'] == FAKE_INSUFFICIENT_FUNDS_CARD_CVV):
             raise serializers.ValidationError(_('La tarjeta no cuenta con fondos suficientes'))
-        
-        # expired card
-        if (attrs['expiration_date'] < datetime.date.today()):
-            raise serializers.ValidationError(_('La tarjeta esta vencida'))
 
         return attrs
