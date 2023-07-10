@@ -117,6 +117,16 @@ class Appointment(models.Model):
         if self.reason == constants.REASON_VACCINATION_B:
             return constants.VACCINE_B
         return None
+    
+    @classmethod
+    def cancel_pending_and_accepted_appointments(cls):
+        today = datetime.date.today()
+        updated = cls.objects.filter(
+            date__lt=today,
+            status__in=[constants.STATUS_PENDING, constants.STATUS_ACCEPTED]
+        ).update(status=constants.STATUS_CANCELED)
+        if updated:
+            print(f"Updated {updated} appointments to {constants.STATUS_CANCELED}")
        
 
 def get_last_appointment(pet, reason) -> Appointment:

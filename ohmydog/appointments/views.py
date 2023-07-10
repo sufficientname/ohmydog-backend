@@ -23,6 +23,7 @@ class AppointmentViewSet(mixins.CreateModelMixin,
     filterset_fields = ['pet', 'status']
 
     def get_queryset(self):
+        Appointment.cancel_pending_and_accepted_appointments()
         user = self.request.user
         return Appointment.objects.filter(user=user).order_by('date', 'hour')
     
@@ -50,6 +51,7 @@ class AppointmentAdminViewSet(mixins.RetrieveModelMixin,
     filterset_class = AppointmentFilter
 
     def get_queryset(self):
+        Appointment.cancel_pending_and_accepted_appointments()
         return Appointment.objects.all().order_by('date', 'hour')
     
     def get_serializer_class(self):
