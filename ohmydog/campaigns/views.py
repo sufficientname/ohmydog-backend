@@ -72,5 +72,6 @@ class CampaignAdminViewSet(mixins.CreateModelMixin,
     @action(methods=['GET'], detail=True, url_path='donations')
     def donations(self, request, pk=None):
         campaign = self.get_object()
-        serializer = self.get_serializer(campaign.campaigndonation_set.all(), many=True)
+        queryset = campaign.campaigndonation_set.all()
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
