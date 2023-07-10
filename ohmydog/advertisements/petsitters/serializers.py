@@ -81,7 +81,7 @@ class PetSitterAdCompleteSerializer(serializers.ModelSerializer):
 
     def update(self, instance: PetSitterAd, validated_data):
         instance.complete()
-        self.instance.save()
+        instance.save()
         return instance
 
 
@@ -100,7 +100,7 @@ class PetSitterAdCancelSerializer(serializers.ModelSerializer):
 
     def update(self, instance: PetSitterAd, validated_data):
         instance.cancel()
-        self.instance.save()
+        instance.save()
         return instance
 
 

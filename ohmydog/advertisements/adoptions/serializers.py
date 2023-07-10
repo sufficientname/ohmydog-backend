@@ -74,7 +74,7 @@ class AdoptionAdCompleteSerializer(serializers.ModelSerializer):
 
     def update(self, instance: AdoptionAd, validated_data):
         instance.complete()
-        self.instance.save()
+        instance.save()
         return instance
 
 
@@ -93,7 +93,7 @@ class AdoptionAdCancelSerializer(serializers.ModelSerializer):
 
     def update(self, instance: AdoptionAd, validated_data):
         instance.cancel()
-        self.instance.save()
+        instance.save()
         return instance
 
 

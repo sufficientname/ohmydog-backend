@@ -29,9 +29,12 @@ class UserSerializer(serializers.ModelSerializer):
             'phone_number',
             'birthdate',
             'password_set',
+            'discount_amount',
         ]
         read_only_fields = [
+            'id',
             'is_staff',
+            'discount_amount',
         ]
 
     def validate_birthdate(self, value):

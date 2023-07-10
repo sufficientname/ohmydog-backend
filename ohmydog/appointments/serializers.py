@@ -13,6 +13,7 @@ from ohmydog.appointments import exceptions
 class AppointmentSerializer(serializers.ModelSerializer):
     pet_name = serializers.SerializerMethodField()
     user_fullname = serializers.SerializerMethodField()
+    user_discount_amount = serializers.SerializerMethodField()
 
     class Meta:
         model = Appointment
@@ -20,6 +21,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
             'id',
             'user',
             'user_fullname',
+            'user_discount_amount',
             'pet',
             'pet_name',
             'reason',
@@ -33,6 +35,8 @@ class AppointmentSerializer(serializers.ModelSerializer):
             'booster_date',
             'observations',
             'price',
+            'paid_amount',
+            'discount_amount',
             'can_accept',
             'can_reject',
             'can_complete',
@@ -44,6 +48,9 @@ class AppointmentSerializer(serializers.ModelSerializer):
     
     def get_user_fullname(self, instance):
         return f'{instance.user.first_name} {instance.user.last_name}'
+    
+    def get_user_discount_amount(self, instance):
+        return instance.user.discount_amount
     
 
 class AppointmentRequestSerializer(serializers.ModelSerializer):
@@ -148,7 +155,7 @@ class AppointmentRejectSerializer(serializers.ModelSerializer):
 
     def update(self, instance: Appointment, validated_data):
         instance.reject(validated_data['suggestion_date'])
-        self.instance.save()
+        instance.save()
 
         send_mail(
             _('Tu solicutud de turno en Oh my dog! fue rechazada'),
@@ -193,7 +200,11 @@ class AppointmentCompleteSerializer(serializers.ModelSerializer):
     def update(self, instance: Appointment, validated_data):
         with transaction.atomic():
             instance.complete(validated_data['price'], validated_data['observations'])
-            self.instance.save()
+            instance.apply_discount(instance.user.discount_amount)
+            instance.save()
+
+            instance.user.reset_discount_amount()
+            instance.user.save()
 
             if validated_data['update_health_record']:
                 health_record_entries = instance.make_health_record_entries(validated_data['weight'])
@@ -219,5 +230,5 @@ class AppointmentCancelSerializer(serializers.ModelSerializer):
 
     def update(self, instance: Appointment, validated_data):
         instance.cancel()
-        self.instance.save()
+        instance.save()
         return instance

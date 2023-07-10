@@ -59,7 +59,7 @@ class CampaignCancelSerializer(serializers.ModelSerializer):
 
     def update(self, instance: Campaign, validated_data):
         instance.cancel()
-        self.instance.save()
+        instance.save()
         return instance
 
 
@@ -78,11 +78,12 @@ class CampaignCompleteSerializer(serializers.ModelSerializer):
 
     def update(self, instance: Campaign, validated_data):
         instance.complete()
-        self.instance.save()
+        instance.save()
         return instance
 
 
 class CampaignDonateSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=decimal.Decimal('0.01'))
     donor_first_name = serializers.CharField(max_length=150)
     donor_last_name = serializers.CharField(max_length=150)
@@ -93,6 +94,7 @@ class CampaignDonateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CampaignDonation
         fields = [
+            'user',
             'amount',
             'donor_first_name',
             'donor_last_name',
@@ -117,10 +119,17 @@ class CampaignDonateSerializer(serializers.ModelSerializer):
                 donor_last_name=validated_data['donor_last_name'],
                 donor_email=validated_data['donor_email'],
                 donor_phone_number=validated_data['donor_phone_number'],
+                user=validated_data['user']
             )
-            if donation is not None:
-                donation.save()
+            donation.save()
+
+            if donation.user is not None:
+                donation.user.add_discount_amount(donation.calculate_discount_amount())
+                donation.user.save()
+
+            instance.add_current_amount(donation.amount)
             instance.save()
+
             return instance
 
 
@@ -130,6 +139,7 @@ class CampaignDonationSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'campaign',
+            'user',
             'amount',
             'donor_first_name',
             'donor_last_name',

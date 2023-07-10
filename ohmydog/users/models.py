@@ -11,3 +11,10 @@ class User(AbstractUser):
     phone_number = models.CharField(_("phone number"), max_length=32)
     birthdate = models.DateField(_("birth date"), null=True)
     password_set = models.BooleanField(_("password set"), default=False)
+    discount_amount = models.DecimalField(_("discount amount"), max_digits=16, decimal_places=2, default=0)
+
+    def add_discount_amount(self, amount):
+        self.discount_amount += amount
+    
+    def reset_discount_amount(self):
+        self.discount_amount = 0

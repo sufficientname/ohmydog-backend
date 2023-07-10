@@ -45,6 +45,8 @@ class Appointment(models.Model):
     observations = models.TextField()
     days_to_booster = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=16 ,decimal_places=2, default=0)
+    paid_amount = models.DecimalField(max_digits=16 ,decimal_places=2, default=0)
+    discount_amount = models.DecimalField(max_digits=16 ,decimal_places=2, default=0)
 
     @property
     def booster_date(self):
@@ -99,6 +101,12 @@ class Appointment(models.Model):
         self.status = constants.STATUS_COMPLETED
         self.price = price
         self.observations = observations
+    
+    def apply_discount(self, discount_amount):
+        self.discount_amount = discount_amount
+        self.paid_amount = self.price - discount_amount
+        if self.paid_amount < 0:
+            self.paid_amount = 0
 
     def make_health_record_entries(self, weight):
         vaccine = self.get_vaccine()

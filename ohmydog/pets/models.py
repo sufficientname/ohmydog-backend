@@ -59,7 +59,7 @@ class Pet(models.Model):
 
 class HealthRecordEntry(models.Model):
     pet = models.ForeignKey('pets.Pet', on_delete=models.CASCADE)
-    appointment = models.ForeignKey('appointments.Appointment', on_delete=models.CASCADE, null=True)
+    appointment = models.ForeignKey('appointments.Appointment', on_delete=models.SET_NULL, null=True)
     date = models.DateField()
     entry_type = models.CharField(max_length=16, choices=constants.ENTRY_TYPE_CHOICES)
     vaccine = models.CharField(max_length=16, null=True)

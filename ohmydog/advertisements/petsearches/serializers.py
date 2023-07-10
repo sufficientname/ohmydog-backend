@@ -80,7 +80,7 @@ class PetSearchAdCompleteSerializer(serializers.ModelSerializer):
 
     def update(self, instance: PetSearchAd, validated_data):
         instance.complete()
-        self.instance.save()
+        instance.save()
         return instance
 
 
@@ -99,7 +99,7 @@ class PetSearchAdCancelSerializer(serializers.ModelSerializer):
 
     def update(self, instance: PetSearchAd, validated_data):
         instance.cancel()
-        self.instance.save()
+        instance.save()
         return instance
 
 
