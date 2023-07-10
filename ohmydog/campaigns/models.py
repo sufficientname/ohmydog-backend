@@ -52,4 +52,3 @@ class CampaignDonation(models.Model):
     donor_email = models.EmailField()
     donor_phone_number = models.CharField(max_length=32)
     created_at = models.DateTimeField(auto_now_add=True)
-    

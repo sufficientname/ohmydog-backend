@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 import decimal
 
-from ohmydog.serializer_fields import PhoneNumberField
+from ohmydog.serializer_fields import PhoneNumberField, CreditCardSerializer
 from ohmydog.campaigns.models import Campaign, CampaignDonation
 
 
@@ -87,6 +87,7 @@ class CampaignDonateSerializer(serializers.ModelSerializer):
     donor_last_name = serializers.CharField(max_length=150)
     donor_email = serializers.EmailField()
     donor_phone_number = PhoneNumberField()
+    credit_card = CreditCardSerializer(write_only=True)
 
     class Meta:
         model = CampaignDonation
@@ -96,6 +97,7 @@ class CampaignDonateSerializer(serializers.ModelSerializer):
             'donor_last_name',
             'donor_email',
             'donor_phone_number',
+            'credit_card',
         ]
 
     def to_representation(self, instance):
