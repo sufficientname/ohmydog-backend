@@ -194,11 +194,11 @@ class AppointmentCompleteSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             instance.complete(validated_data['price'], validated_data['observations'])
             self.instance.save()
-            
+
             if validated_data['update_health_record']:
-                entries = instance.make_health_record_entries(validated_data['weight'])
-                import pdb; pdb.set_trace()
-                # HealthRecordEntry.objects.bulk_create(entries)
+                health_record_entries = self.make_health_record_entries(validated_data['weight'])
+                if health_record_entries:
+                    instance.pet.healthrecordentry_set.bulk_create(health_record_entries)
 
             return instance
 

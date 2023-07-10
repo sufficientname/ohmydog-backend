@@ -5,7 +5,7 @@ from ohmydog.advertisements.adoptions import constants
 
 
 class AdoptionAd(AbstractAd):
-    pet_name = models.CharField(max_length=32, null=True)
-    pet_age = models.PositiveIntegerField(null=False)
-    pet_gender = models.CharField(max_length=16, choices=constants.GENDER_CHOICES, null=False)
-    pet_size = models.CharField(max_length=16, choices=constants.SIZE_CHOICES, null=False)
+    pet_name = models.CharField(max_length=32)
+    pet_age = models.PositiveIntegerField()
+    pet_gender = models.CharField(max_length=16, choices=constants.GENDER_CHOICES)
+    pet_size = models.CharField(max_length=16, choices=constants.SIZE_CHOICES)

@@ -34,27 +34,17 @@ class AppointmentManager(models.Manager):
 class Appointment(models.Model):
     objects = AppointmentManager()
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False)
-    pet = models.ForeignKey('pets.Pet', on_delete=models.CASCADE, null=False)
-    reason = models.CharField(max_length=16, choices=constants.REASON_CHOICES, null=False)
-    date = models.DateField(null=False)
-    timeslot = models.CharField(max_length=16, choices=constants.TIMESLOT_CHOICES, null=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    pet = models.ForeignKey('pets.Pet', on_delete=models.CASCADE)
+    reason = models.CharField(max_length=16, choices=constants.REASON_CHOICES)
+    date = models.DateField()
+    timeslot = models.CharField(max_length=16, choices=constants.TIMESLOT_CHOICES)
     hour = models.TimeField(null=True)
     suggestion_date = models.DateField(null=True)
-    status = models.CharField(max_length=16, choices=constants.STATUS_CHOICES, default=constants.STATUS_PENDING, null=False)
-    observations = models.TextField(null=False)
-    days_to_booster = models.PositiveIntegerField(null=False)
-    price = models.DecimalField(max_digits=16 ,decimal_places=2, null=False, default=0)
-
-    def is_vaccinantion(self):
-        return self.reason in constants.VACCINATION_REASONS
-
-    def get_vaccine(self):
-        if self.status == constants.REASON_VACCINATION_A:
-            return constants.VACCINE_A
-        if self.status == constants.REASON_VACCINATION_B:
-            return constants.VACCINE_B
-        return None
+    status = models.CharField(max_length=16, choices=constants.STATUS_CHOICES, default=constants.STATUS_PENDING)
+    observations = models.TextField()
+    days_to_booster = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=16 ,decimal_places=2, default=0)
 
     def booster_date(self):
         if not self.days_to_booster:
@@ -91,7 +81,7 @@ class Appointment(models.Model):
             (self.date >= datetime.date.today())
         )
 
-    def cancel(self, check=False):
+    def cancel(self, check=True):
         if check and not self.can_cancel():
             return
         self.status = constants.STATUS_CANCELED
@@ -110,26 +100,23 @@ class Appointment(models.Model):
         self.observations = observations
 
     def make_health_record_entries(self, weight):
+        vaccine = self.get_vaccine()
         entries = []
-
-        weight_entry = HealthRecordEntry(
-            pet=self.pet,
-            date=self.date,
-            entry_type=constants.ENTRY_TYPE_WEIGHT,
-            weight=weight,
-        )
-        entries.append(weight_entry)
-
-        if self.is_vaccinantion():
-            vaccine_entry = HealthRecordEntry(
-                pet=self.pet,
-                date=self.date,
-                entry_type=constants.ENTRY_TYPE_WEIGHT,
-                vaccine=self.get_vaccine(),
-            )
+        if weight:
+            weight_entry = self.pet.make_weight_health_record_entry(self.date, weight)
+            entries.append(weight_entry)
+        if vaccine:
+            vaccine_entry = self.pet.make_vaccine_health_record_entry(self.date, vaccine)
             entries.append(vaccine_entry)
-
         return entries
+
+    def get_vaccine(self):
+        if self.status == constants.REASON_VACCINATION_A:
+            return constants.VACCINE_A
+        if self.status == constants.REASON_VACCINATION_B:
+            return constants.VACCINE_B
+        return None
+       
 
 def get_last_appointment(pet, reason) -> Appointment:
     status = constants.STATUS_COMPLETED

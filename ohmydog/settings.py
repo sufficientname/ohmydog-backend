@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'ohmydog.users',
     'ohmydog.pets',
     'ohmydog.appointments',
+    'ohmydog.campaigns',
     'ohmydog.advertisements.adoptions',
     'ohmydog.advertisements.petsearches',
     'ohmydog.advertisements.petsitters',

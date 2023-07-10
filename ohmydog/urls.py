@@ -21,10 +21,15 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('drf-auth', include('rest_framework.urls', namespace='rest_framework')),
+
     path('', include('ohmydog.users.urls', namespace='users')),
 
     path('', include('ohmydog.pets.urls', namespace='pets')),
+    
     path('', include('ohmydog.appointments.urls', namespace='appointments')),
+    
+    path('', include('ohmydog.campaigns.urls', namespace='campaigns')),
+
     path('', include('ohmydog.advertisements.adoptions.urls', namespace='adoptions')),
     path('', include('ohmydog.advertisements.petsearches.urls', namespace='petsearches')),
     path('', include('ohmydog.advertisements.petsitters.urls', namespace='petsitters')),
