@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 import decimal
 
-from ohmydog.serializer_fields import PhoneNumberField, CreditCardSerializer
+from ohmydog.serializers import PhoneNumberField, CreditCardSerializer
 from ohmydog.campaigns.models import Campaign, CampaignDonation
 
 

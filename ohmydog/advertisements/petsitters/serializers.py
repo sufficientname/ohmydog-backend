@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django.core.mail import send_mail
 
-from ohmydog.serializer_fields import PhoneNumberField
+from ohmydog.serializers import PhoneNumberField
 from ohmydog.advertisements.petsitters.models import PetSitterAd
 
 

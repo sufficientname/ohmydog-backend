@@ -10,7 +10,7 @@ from dateutil import relativedelta
 
 from ohmydog.users.models import User
 from ohmydog.users import constants
-from ohmydog.serializer_fields import PhoneNumberField
+from ohmydog.serializers import PhoneNumberField
 
 
 class UserSerializer(serializers.ModelSerializer):
