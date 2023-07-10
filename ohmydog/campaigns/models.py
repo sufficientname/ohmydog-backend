@@ -11,8 +11,9 @@ class Campaign(models.Model):
     goal_amount = models.DecimalField(max_digits=16, decimal_places=2)
     status = models.CharField(max_length=16, choices=constants.STATUS_CHOICES, default=constants.STATUS_PUBLISHED)
 
+    @property
     def current_amount(self):
-        return self.campaigndonation_set.aggregate(models.Sum('amount'))
+        return self.campaigndonation_set.aggregate(models.Sum('amount')).get('amount__sum', 0)
 
     def can_cancel(self):
         return self.status == constants.STATUS_PUBLISHED

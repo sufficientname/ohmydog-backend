@@ -1,9 +1,9 @@
 from ohmydog.utils.choices import choice, make_choices
 from django.utils.translation import gettext_lazy as _
 
-STATUS_PUBLISHED = 'PUBLICADA'
-STATUS_CANCELED = 'CANCELADA'
-STATUS_COMPLETED = 'COMPLETADA'
+STATUS_PUBLISHED = 'PUB'
+STATUS_CANCELED = 'CAN'
+STATUS_COMPLETED = 'COM'
 
 STATUSES = {
     STATUS_PUBLISHED: choice(STATUS_PUBLISHED, _('Publicada')),

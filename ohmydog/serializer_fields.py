@@ -24,15 +24,18 @@ def validate_phonenumber(value):
 
 class CreditCardSerializer(serializers.Serializer):
     name_on_card = serializers.CharField(max_length=300)
-    card_number = serializers.CharField(max_length=16)
-    cvv = serializers.CharField(max_length=3)
+    card_number = serializers.CharField(min_length=16, max_length=16)
+    cvv = serializers.CharField(min_length=3, max_length=3)
     expiration_date = serializers.DateField()
 
     def validate_card_number(self, value):
         if not value.isdigit():
             raise serializers.ValidationError(_('El número de tarjeta debe ser numérico'))
-        if len(value) != 16:
-            raise serializers.ValidationError(_('El número de tarjeta debe tener 16 dígitos'))
+        return value
+
+    def validate_cvv(self, value):
+        if not value.isdigit():
+            raise serializers.ValidationError(_('El CVV debe ser numérico'))
         return value
 
     def validate(self, attrs):

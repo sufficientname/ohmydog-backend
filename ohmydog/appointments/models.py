@@ -46,6 +46,7 @@ class Appointment(models.Model):
     days_to_booster = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=16 ,decimal_places=2, default=0)
 
+    @property
     def booster_date(self):
         if not self.days_to_booster:
             return None
@@ -136,8 +137,8 @@ def check_vaccine_a(pet, date) -> int:
         raise exceptions.BadReasonError("Mascotas menores a 2 meses no pueden recibir vacuna de tipo A.")
 
     last_appointment = get_last_appointment(pet, constants.REASON_VACCINATION_A)
-    if last_appointment and last_appointment.booster_date() > date:
-        raise exceptions.BadReasonError(f"Esta mascota ya recibio una vacuna de tipo A en los ultimos {last_appointment.days_to_booster} dias. Solicite un turno a partir del dia {last_appointment.booster_date()}.")
+    if last_appointment and last_appointment.booster_date > date:
+        raise exceptions.BadReasonError(f"Esta mascota ya recibio una vacuna de tipo A en los ultimos {last_appointment.days_to_booster} dias. Solicite un turno a partir del dia {last_appointment.booster_date}.")
 
     # entre 2 y 4 meses necesitan refuerzo a los 21 dias
     if (pet_age.years == 0 and pet_age.months <= 4):
@@ -155,9 +156,9 @@ def check_vaccine_b(pet, date) -> int:
         raise exceptions.BadReasonError("Mascotas menores a 4 meses no pueden recibir vacuna de tipo B.")
 
     last_appointment = get_last_appointment(pet, constants.REASON_VACCINATION_B)
-    if last_appointment and last_appointment.booster_date() > date:
+    if last_appointment and last_appointment.booster_date > date:
         raise exceptions.BadReasonError(
-            f"Esta mascota ya recibio una vacuna de tipo B en los ultimos {last_appointment.days_to_booster} dias. Solicite un turno a partir del dia {last_appointment.booster_date()}.")
+            f"Esta mascota ya recibio una vacuna de tipo B en los ultimos {last_appointment.days_to_booster} dias. Solicite un turno a partir del dia {last_appointment.booster_date}.")
 
     # mayores a 4 meses necesitan refuerzo a los 365 dias
     return 365
