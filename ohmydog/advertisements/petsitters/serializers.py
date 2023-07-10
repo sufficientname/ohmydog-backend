@@ -27,9 +27,13 @@ class PetSitterAdSerializer(serializers.ModelSerializer):
             'sitter_phone_number',
             'service_type',
             'service_area',
+            'pause_start_date',
+            'pause_end_date',
             'can_complete',
             'can_cancel',
             'can_contact',
+            'can_pause',
+            'can_unpause',
             'is_mine',
         ]
         read_only_fields = [
@@ -156,4 +160,70 @@ class PetSitterAdContactSerializer(serializers.ModelSerializer):
             fail_silently=True,
         )
 
+        return instance
+
+
+class PetSitterAdPauseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PetSitterAd
+        fields = []
+
+    def to_representation(self, instance):
+        return PetSitterAdSerializer(instance, context=self.context).to_representation(instance)
+
+    def validate(self, attrs):
+        if not self.instance.can_pause():
+            raise serializers.ValidationError(_('Este anuncio no puede ser pausado'))
+        return attrs
+
+    def update(self, instance: PetSitterAd, validated_data):
+        instance.pause()
+        instance.save()
+        return instance
+
+
+class PetSitterAdPauseRangeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PetSitterAd
+        fields = [
+            'pause_start_date',
+            'pause_end_date',
+        ]
+
+    def to_representation(self, instance):
+        return PetSitterAdSerializer(instance, context=self.context).to_representation(instance)
+    
+    def validate(self, attrs):
+        if attrs['pause_start_date'] > attrs['pause_end_date']:
+            raise serializers.ValidationError(_('La fecha de inicio de pausa debe ser anterior a la fecha de fin de pausa'))
+
+        if not self.instance.can_pause():
+            raise serializers.ValidationError(_('Este anuncio no puede ser pausado'))
+
+        return attrs
+
+    def update(self, instance: PetSitterAd, validated_data):
+        instance.pause_range(
+            validated_data['pause_start_date'],
+            validated_data['pause_end_date'],
+        )
+        instance.save()
+        return instance
+
+class PetSitterAdUnpauseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PetSitterAd
+        fields = []
+
+    def to_representation(self, instance):
+        return PetSitterAdSerializer(instance, context=self.context).to_representation(instance)
+
+    def validate(self, attrs):
+        if not self.instance.can_unpause():
+            raise serializers.ValidationError(_('Este anuncio no puede ser despausado'))
+        return attrs
+
+    def update(self, instance: PetSitterAd, validated_data):
+        instance.unpause()
+        instance.save()
         return instance

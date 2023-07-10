@@ -10,6 +10,9 @@ from ohmydog.advertisements.petsitters.serializers import (
     PetSitterAdCancelSerializer,
     PetSitterAdCompleteSerializer,
     PetSitterAdContactSerializer,
+    PetSitterAdPauseSerializer,
+    PetSitterAdPauseRangeSerializer,
+    PetSitterAdUnpauseSerializer,
 )
 
 
@@ -17,9 +20,11 @@ class PetSitterAdViewSet(mixins.RetrieveModelMixin,
                          mixins.ListModelMixin,
                          viewsets.GenericViewSet):
     permission_classes = [permissions.IsCustomerUserOrReadOnly]
-    filterset_fields = ['user', 'status']
+    filterset_fields = ['status']
 
     def get_queryset(self):
+        PetSitterAd.pause_inrange_ads()
+        PetSitterAd.unpause_inrage_ads()
         return PetSitterAd.objects.all()
     
     def get_serializer_class(self):
@@ -43,9 +48,11 @@ class PetSitterAdAdminViewSet(mixins.CreateModelMixin,
                               mixins.ListModelMixin,
                               viewsets.GenericViewSet):
     permission_classes = [permissions.IsAdminUser]
-    filterset_fields = ['user', 'status']
+    filterset_fields = ['status']
 
     def get_queryset(self):
+        PetSitterAd.pause_inrange_ads()
+        PetSitterAd.unpause_inrage_ads()
         return PetSitterAd.objects.all()
 
     def get_serializer_class(self):
@@ -53,6 +60,12 @@ class PetSitterAdAdminViewSet(mixins.CreateModelMixin,
             return PetSitterAdCancelSerializer
         if self.action == 'complete':
             return PetSitterAdCompleteSerializer
+        if self.action == 'pause':
+            return PetSitterAdPauseSerializer
+        if self.action == 'pauserange':
+            return PetSitterAdPauseRangeSerializer
+        if self.action == 'unpause':
+            return PetSitterAdUnpauseSerializer
         return PetSitterAdSerializer
 
     @action(methods=['POST'], detail=True, url_path='cancel')
@@ -65,6 +78,30 @@ class PetSitterAdAdminViewSet(mixins.CreateModelMixin,
     
     @action(methods=['POST'], detail=True, url_path='complete')
     def complete(self, request, pk=None):
+        ad = self.get_object()
+        serializer = self.get_serializer(ad, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    
+    @action(methods=['POST'], detail=True, url_path='pause')
+    def pause(self, request, pk=None):
+        ad = self.get_object()
+        serializer = self.get_serializer(ad, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    
+    @action(methods=['POST'], detail=True, url_path='pauserange')
+    def pauserange(self, request, pk=None):
+        ad = self.get_object()
+        serializer = self.get_serializer(ad, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    
+    @action(methods=['POST'], detail=True, url_path='unpause')
+    def unpause(self, request, pk=None):
         ad = self.get_object()
         serializer = self.get_serializer(ad, data=request.data)
         serializer.is_valid(raise_exception=True)
