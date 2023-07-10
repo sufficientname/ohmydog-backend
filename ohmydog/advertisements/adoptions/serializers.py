@@ -20,7 +20,7 @@ class AdoptionAdSerializer(serializers.ModelSerializer):
             'id',
             'user',
             'status',
-            'date_created',
+            'created_at',
             'pet_name',
             'pet_age',
             'pet_gender',
@@ -33,7 +33,7 @@ class AdoptionAdSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'id',
             'status',
-            'date_created',
+            'created_at',
         ]
     
     def get_is_mine(self, instance: AdoptionAd):

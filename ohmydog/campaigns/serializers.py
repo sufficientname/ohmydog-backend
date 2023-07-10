@@ -17,6 +17,7 @@ class CampaignSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'status',
+            'created_at'
             'name',
             'description',
             'start_date',
@@ -31,9 +32,9 @@ class CampaignSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'id',
             'status',
+            'created_at'
             'start_date',
             'current_amount',
-            'donations',
         ]
 
     def get_donations(self, instance: Campaign):

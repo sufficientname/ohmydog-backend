@@ -6,10 +6,11 @@ from ohmydog.campaigns import constants
 class Campaign(models.Model):
     name = models.CharField(max_length=150)
     description = models.TextField()
-    start_date = models.DateTimeField(auto_now_add=True)
-    end_date = models.DateTimeField()
+    start_date = models.DateField(auto_now_add=True)
+    end_date = models.DateField()
     goal_amount = models.DecimalField(max_digits=16, decimal_places=2)
     status = models.CharField(max_length=16, choices=constants.STATUS_CHOICES, default=constants.STATUS_PUBLISHED)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     @property
     def current_amount(self):

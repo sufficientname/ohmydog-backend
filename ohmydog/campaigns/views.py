@@ -17,6 +17,7 @@ class CampaignViewSet(mixins.RetrieveModelMixin,
                       mixins.ListModelMixin,
                       viewsets.GenericViewSet):
     permission_classes = [permissions.IsCustomerUserOrReadOnly]
+    filterset_fields = ['status', 'end_date']
 
     def get_queryset(self):
         return Campaign.objects.all().order_by('start_date', 'end_date')
@@ -40,6 +41,7 @@ class CampaignAdminViewSet(mixins.CreateModelMixin,
                            mixins.ListModelMixin,
                            viewsets.GenericViewSet):
     permission_classes = [permissions.IsAdminUser]
+    filterset_fields = ['status', 'date']
 
     def get_queryset(self):
         return Campaign.objects.all().order_by('start_date', 'end_date')
