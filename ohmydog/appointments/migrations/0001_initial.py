@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 ('timeslot', models.CharField(choices=[('MANANA', 'Mañana'), ('TARDE', 'Tarde')], max_length=16)),
                 ('hour', models.TimeField(null=True)),
                 ('suggestion_date', models.DateField(null=True)),
-                ('status', models.CharField(choices=[('PEN', 'Pendiente'), ('APR', 'Aceptado'), ('REJ', 'Rechazado'), ('CAN', 'Cancelado'), ('COM', 'Completado')], default='PEN', max_length=16)),
+                ('status', models.CharField(choices=[('PEN', 'Pendiente'), ('ACE', 'Aceptado'), ('REJ', 'Rechazado'), ('CAN', 'Cancelado'), ('COM', 'Completado')], default='PEN', max_length=16)),
                 ('observations', models.TextField()),
                 ('days_to_booster', models.PositiveIntegerField()),
                 ('price', models.DecimalField(decimal_places=2, default=0, max_digits=16)),

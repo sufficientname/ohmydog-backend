@@ -105,7 +105,7 @@ class AppointmentAcceptSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if not self.instance.can_accept():
-            raise serializers.ValidationError(_('Este turno no puede ser aprobado'))
+            raise serializers.ValidationError(_('Este turno no puede ser aceptado'))
         return attrs
 
     def update(self, instance: Appointment, validated_data):
