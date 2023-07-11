@@ -83,7 +83,6 @@ class CampaignCompleteSerializer(serializers.ModelSerializer):
 
 
 class CampaignDonateSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=decimal.Decimal('0.01'))
     donor_first_name = serializers.CharField(max_length=150)
     donor_last_name = serializers.CharField(max_length=150)
@@ -94,7 +93,6 @@ class CampaignDonateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CampaignDonation
         fields = [
-            'user',
             'amount',
             'donor_first_name',
             'donor_last_name',
@@ -114,12 +112,12 @@ class CampaignDonateSerializer(serializers.ModelSerializer):
     def update(self, instance: Campaign, validated_data):
         with transaction.atomic():
             donation = instance.make_donation(
+                user=self.context['request'].user,
                 amount=validated_data['amount'],
                 donor_first_name=validated_data['donor_first_name'],
                 donor_last_name=validated_data['donor_last_name'],
                 donor_email=validated_data['donor_email'],
                 donor_phone_number=validated_data['donor_phone_number'],
-                user=validated_data['user']
             )
             donation.save()
 

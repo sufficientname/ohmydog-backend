@@ -13,6 +13,10 @@ class User(AbstractUser):
     password_set = models.BooleanField(_("password set"), default=False)
     discount_amount = models.DecimalField(_("discount amount"), max_digits=16, decimal_places=2, default=0)
 
+    @property
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
+
     def add_discount_amount(self, amount):
         self.discount_amount += amount
     

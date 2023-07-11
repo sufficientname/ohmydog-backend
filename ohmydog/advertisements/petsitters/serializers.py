@@ -10,7 +10,6 @@ from ohmydog.advertisements.petsitters.models import PetSitterAd
 
 
 class PetSitterAdSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     is_mine = serializers.SerializerMethodField()
     sitter_phone_number = PhoneNumberField()
 
@@ -38,6 +37,7 @@ class PetSitterAdSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             'id',
+            'user',
             'status',
             'created_at',
         ]
@@ -46,7 +46,9 @@ class PetSitterAdSerializer(serializers.ModelSerializer):
         return instance.user == self.context['request'].user
 
     def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
         ad = super().create(validated_data)
+
         send_mail(
             _('Tu anuncio de servicio de paseadores o cuidadores fue publicado en Oh my dog!'),
             _('Los datos del anuncio son:\n nombre: %(sitter_first_name)s\n apellido: %(sitter_last_name)s\n email: %(sitter_email)s\n telefono: %(sitter_phone_number)s\n servicio: %(service_type)s\n zona: %(service_area)s')

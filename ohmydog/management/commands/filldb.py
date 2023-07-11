@@ -1,7 +1,10 @@
 from django.core.management.base import BaseCommand, CommandError
 
 from ohmydog.users.models import User
+
 from ohmydog.pets.models import Pet
+from ohmydog.pets import constants as pets_constants
+
 from ohmydog.appointments.models import Appointment
 from ohmydog.appointments import constants as appointments_constants
 
@@ -43,6 +46,7 @@ class Command(BaseCommand):
             user=user1, 
             name="user1_pet1",
             breed="caniche",
+            gender=pets_constants.GENDER_MALE,
             color="negro",
             birthdate=datetime.date(2010, 1, 1)
         )
@@ -53,6 +57,7 @@ class Command(BaseCommand):
             user=user1, 
             name="user1_pet2",
             breed="caniche",
+            gender=pets_constants.GENDER_MALE,
             color="blanco",
             birthdate=datetime.date(2010, 2, 2)
         )
@@ -62,6 +67,7 @@ class Command(BaseCommand):
             user=user2, 
             name="user2_pet1",
             breed="maltes",
+            gender=pets_constants.GENDER_FEMALE,
             color="blanco",
             birthdate=datetime.date(2010, 2, 2)
         )
@@ -83,6 +89,7 @@ class Command(BaseCommand):
             user=user3, 
             name="menor a 2 meses",
             breed="maltes",
+            gender=pets_constants.GENDER_MALE,
             color="blanco",
             birthdate=datetime.date.today() - datetime.timedelta(days=45)
         )
@@ -91,6 +98,7 @@ class Command(BaseCommand):
             user=user3, 
             name="entre 2 y 4 meses",
             breed="maltes",
+            gender=pets_constants.GENDER_FEMALE,
             color="blanco",
             birthdate=datetime.date.today() - datetime.timedelta(days=95)
         )
@@ -99,6 +107,7 @@ class Command(BaseCommand):
             user=user3, 
             name="mayor a 4 meses",
             breed="maltes",
+            gender=pets_constants.GENDER_MALE,
             color="blanco",
             birthdate=datetime.date.today() - datetime.timedelta(days=140)
         )
@@ -107,6 +116,7 @@ class Command(BaseCommand):
             user=user3, 
             name="entre 2 y 4 meses con vacuna A",
             breed="maltes",
+            gender=pets_constants.GENDER_FEMALE,
             color="blanco",
             birthdate=datetime.date.today() - datetime.timedelta(days=95)
         )
@@ -126,6 +136,7 @@ class Command(BaseCommand):
             user=user3, 
             name="mayor a 4 meses con vacuna A y B",
             breed="maltes",
+            gender=pets_constants.GENDER_MALE,
             color="blanco",
             birthdate=datetime.date.today() - datetime.timedelta(days=300)
         )

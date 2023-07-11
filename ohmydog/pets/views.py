@@ -4,7 +4,12 @@ from rest_framework.decorators import action
 
 from ohmydog import permissions
 from ohmydog.pets.models import Pet
-from ohmydog.pets.serializers import PetSerializer, HealthRecordEntrySerializer
+from ohmydog.pets.serializers import (
+    PetSerializer,
+    PetCreateSerializer,
+    PetCreateAdminSerializer,
+    HealthRecordEntrySerializer
+)
 
 class PetViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsCustomerUser]
@@ -14,7 +19,9 @@ class PetViewSet(viewsets.ModelViewSet):
         return Pet.objects.filter(user=user)
     
     def get_serializer_class(self):
-        if self.action == 'health_record':
+        if self.action == 'create':
+            return PetCreateSerializer
+        if self.action == 'healthrecord':
             return HealthRecordEntrySerializer
         return PetSerializer
     
@@ -34,7 +41,9 @@ class PetAdminViewSet(viewsets.ModelViewSet):
         return Pet.objects.all()
 
     def get_serializer_class(self):
-        if self.action == 'health_record':
+        if self.action == 'create':
+            return PetCreateAdminSerializer
+        if self.action == 'healthrecord':
             return HealthRecordEntrySerializer
         return PetSerializer
 

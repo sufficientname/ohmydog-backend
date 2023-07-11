@@ -10,7 +10,6 @@ from ohmydog.advertisements.petsearches.models import PetSearchAd
 
 
 class PetSearchAdSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     is_mine = serializers.SerializerMethodField()
     pet_age = serializers.IntegerField(min_value=0)
     # pet_photo = serializers.ImageField(required=False, use_url=True)
@@ -37,6 +36,7 @@ class PetSearchAdSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             'id',
+            'user',
             'status',
             'created_at',
         ]
@@ -45,6 +45,7 @@ class PetSearchAdSerializer(serializers.ModelSerializer):
         return instance.user == self.context['request'].user
 
     def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
         ad = super().create(validated_data)
 
         send_mail(

@@ -12,7 +12,7 @@ from ohmydog.appointments import exceptions
 
 class AppointmentSerializer(serializers.ModelSerializer):
     pet_name = serializers.SerializerMethodField()
-    user_fullname = serializers.SerializerMethodField()
+    user_full_name = serializers.SerializerMethodField()
     user_discount_amount = serializers.SerializerMethodField()
 
     class Meta:
@@ -20,7 +20,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'user',
-            'user_fullname',
+            'user_full_name',
             'user_discount_amount',
             'pet',
             'pet_name',
@@ -46,21 +46,19 @@ class AppointmentSerializer(serializers.ModelSerializer):
     def get_pet_name(self, instance):
         return instance.pet.name
     
-    def get_user_fullname(self, instance):
-        return f'{instance.user.first_name} {instance.user.last_name}'
+    def get_user_full_name(self, instance):
+        return instance.user.full_name
     
     def get_user_discount_amount(self, instance):
         return instance.user.discount_amount
     
 
 class AppointmentRequestSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Appointment
         fields = [
             'pet',
-            'user',
             'reason',
             'date',
             'timeslot',
@@ -70,13 +68,19 @@ class AppointmentRequestSerializer(serializers.ModelSerializer):
         return AppointmentSerializer(instance, context=self.context).to_representation(instance)
 
     def validate_pet(self, value):
-        if value.user.id != self.context['request'].user.id:
+        if value.user != self.context['request'].user:
             raise serializers.ValidationError(_('Esta mascota no te pertenece'))
         return value
 
     def create(self, validated_data):
         try:
-            appointmet = self.Meta.model.objects.create_appointment_request(**validated_data)
+            appointmet = self.Meta.model.objects.create_appointment_request(
+                user=self.context['request'].user,
+                pet=validated_data['pet'],
+                reason=validated_data['reason'],
+                date=validated_data['date'],
+                timeslot=validated_data['timeslot']
+            )
            
             send_mail(
                 _('Creaste una solicitud de turno en Oh my dog!'),

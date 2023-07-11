@@ -12,6 +12,7 @@ class Pet(models.Model):
     name = models.CharField(max_length=32)
     breed = models.CharField(max_length=32)
     color = models.CharField(max_length=32)
+    gender = models.CharField(max_length=16, choices=constants.GENDER_CHOICES)
     birthdate = models.DateField()
 
     class Meta:

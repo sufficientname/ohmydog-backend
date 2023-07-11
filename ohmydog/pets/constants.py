@@ -22,3 +22,14 @@ VACCINES = {
 }
 
 VACCINE_CHOICES = make_choices(VACCINES)
+
+
+GENDER_MALE = 'MACHO'
+GENDER_FEMALE = 'HEMBRA'
+
+GENDERS = {
+    GENDER_MALE: choice(GENDER_MALE, _('Macho')),
+    GENDER_FEMALE: choice(GENDER_FEMALE, _('Hembra')),
+}
+
+GENDER_CHOICES = make_choices(GENDERS)

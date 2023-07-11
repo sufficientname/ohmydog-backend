@@ -71,6 +71,7 @@ class UserSerializer(serializers.ModelSerializer):
 
         return user
 
+
 class UserPasswordSerializer(serializers.ModelSerializer):
     
     class Meta:
