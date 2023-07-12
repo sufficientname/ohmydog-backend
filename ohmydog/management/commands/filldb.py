@@ -9,7 +9,7 @@ from ohmydog.appointments.models import Appointment
 from ohmydog.appointments import constants as appointments_constants
 
 from ohmydog.campaigns.models import Campaign
-from ohmydog.campaigns import constants as appointments_constants
+from ohmydog.campaigns import constants as campaigns_constants
 
 import datetime 
 
