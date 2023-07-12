@@ -179,5 +179,5 @@ class Command(BaseCommand):
             name="Refugios caninos de La Plata",
             description="En esta campaña recaudaremos fondos para los refugios caninos de la ciudad de La Plata",
             end_date=datetime.date(year=2200, month=12, day=31),
-            status=appointments_constants.STATUS_PUBLISHED,
+            status=campaigns_constants.STATUS_PUBLISHED,
         )
