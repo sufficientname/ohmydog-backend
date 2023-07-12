@@ -12,7 +12,6 @@ from ohmydog.advertisements.petsearches.models import PetSearchAd
 class PetSearchAdSerializer(serializers.ModelSerializer):
     is_mine = serializers.SerializerMethodField()
     pet_age = serializers.IntegerField(min_value=0)
-    # pet_photo = serializers.ImageField(required=False, use_url=True)
 
     class Meta:
         model = PetSearchAd
