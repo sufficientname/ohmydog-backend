@@ -134,6 +134,9 @@ class Command(BaseCommand):
         vaccine_A_appointment.accept("18:00", check=False)
         vaccine_A_appointment.complete(1000, "sin inconvenientes", check=False)
         vaccine_A_appointment.save()
+        health_record_entries = vaccine_A_appointment.make_health_record_entries(14)
+        if health_record_entries:
+            vaccine_A_appointment.pet.healthrecordentry_set.bulk_create(health_record_entries)
 
         over4monthsWithVaccineAandB = Pet.objects.create(
             user=user3, 
@@ -170,7 +173,7 @@ class Command(BaseCommand):
         vaccine_B_appointment.save()
         health_record_entries = vaccine_B_appointment.make_health_record_entries(14)
         if health_record_entries:
-            vaccine_A_appointment.pet.healthrecordentry_set.bulk_create(health_record_entries)
+            vaccine_B_appointment.pet.healthrecordentry_set.bulk_create(health_record_entries)
 
 
         Appointment.objects.create_appointment_request(
