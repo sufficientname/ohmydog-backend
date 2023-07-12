@@ -83,6 +83,10 @@ class AbstractAd(models.Model):
         updated = cls.objects.filter(
             status=constants.STATUS_PAUSED,
             pause_end_date__lte=today
-        ).update(status=constants.STATUS_PUBLISHED)
+        ).update(
+            status=constants.STATUS_PUBLISHED,
+            pause_start_date=None,
+            pause_end_date=None
+        )
         if updated:
             print(f'Updated {updated} ads to {constants.STATUS_PUBLISHED}')
