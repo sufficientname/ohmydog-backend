@@ -18,9 +18,6 @@ class Pet(models.Model):
     class Meta:
         unique_together = [['name', 'user']]
 
-    def __str__(self):
-        return f'{self.name} ({self.age_months()})'
-
     def age_at(self, date):
         return relativedelta.relativedelta(date, self.birthdate)
 

@@ -8,6 +8,9 @@ from ohmydog.pets import constants as pets_constants
 from ohmydog.appointments.models import Appointment
 from ohmydog.appointments import constants as appointments_constants
 
+from ohmydog.campaigns.models import Campaign
+from ohmydog.campaigns import constants as appointments_constants
+
 import datetime 
 
 class Command(BaseCommand):
@@ -24,7 +27,7 @@ class Command(BaseCommand):
             first_name='user',
             last_name='one',
             id_number='1111',
-            phone_number='(221) 111-1111',
+            phone_number='(221) 555-1111',
             birthdate=datetime.date(2001, 1, 1)
         )
 
@@ -37,7 +40,7 @@ class Command(BaseCommand):
             first_name='user',
             last_name='two',
             id_number='2222',
-            phone_number='(221) 222-2222',
+            phone_number='(221) 555-2222',
             birthdate=datetime.date(2002, 2, 2)
         )
         self.stdout.write(self.style.SUCCESS('created user: %s' % user2))
@@ -81,7 +84,7 @@ class Command(BaseCommand):
             first_name='user',
             last_name='three',
             id_number='3333',
-            phone_number='(221) 333-3333',
+            phone_number='(221) 555-3333',
             birthdate=datetime.date(2003, 3, 3)
         )
 
@@ -170,4 +173,11 @@ class Command(BaseCommand):
             appointments_constants.REASON_CONSULTATION,
             datetime.date.today() - datetime.timedelta(days=30),
             appointments_constants.TIMESLOT_AFTERNOON,
+        )
+
+        Campaign.objects.create(
+            name="Refugios caninos de La Plata",
+            description="En esta campaña recaudaremos fondos para los refugios caninos de la ciudad de La Plata",
+            end_date=datetime.date(year=2200, month=12, day=31),
+            status=appointments_constants.STATUS_PUBLISHED,
         )
