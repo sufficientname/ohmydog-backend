@@ -22,7 +22,7 @@ class CampaignSerializer(serializers.ModelSerializer):
             'description',
             'start_date',
             'end_date',
-            'goal_amount',
+            # 'goal_amount',
             'current_amount',
             'can_donate',
             'can_cancel',
